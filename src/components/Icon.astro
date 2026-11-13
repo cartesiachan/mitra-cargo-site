@@ -1,0 +1,20 @@
+---
+interface Props { name: string; }
+const { name } = Astro.props;
+// Ikon inline SVG (dulu hardcode di tiap kartu). Nama kunci dipakai di konten.json.
+const icons: Record<string, string> = {
+  tag: '<path d="M12 2v20M17 6H9.5a3 3 0 000 6h5a3 3 0 010 6H6"/>',
+  globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14 0 18M12 3c-3 3.5-3 14 0 18"/>',
+  globeSingle: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14 0 18"/>',
+  shieldCheck: '<path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/>',
+  shield: '<path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/>',
+  truck: '<path d="M3 15l1.5-6h15L21 15M3 15h18M3 15v4h18v-4M6 19v2M18 19v2"/>',
+  box: '<path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5"/>',
+  plane: '<path d="M2 16l20-7-9 13-2-7-9-2z"/>',
+  warehouse: '<path d="M3 17h18M5 17V8l7-4 7 4v9M9 17v-4h6v4"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>',
+  motor: '<circle cx="6" cy="17" r="2.5"/><circle cx="18" cy="17" r="2.5"/><path d="M8.5 17h7M6 17l2-6h6l2 3h3"/>',
+  refresh: '<path d="M21 12a9 9 0 11-3-6.7M21 3v6h-6"/>',
+};
+---
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" set:html={icons[name] ?? ''} />

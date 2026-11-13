@@ -1,14 +1,1 @@
-{
-  "call_center": "(021) 3455-420",
-  "whatsapp_umum": "0812-9824-2829",
-  "whatsapp_umum_intl": "6281298242829",
-  "email": "info@mitraperkasacargo.com",
-  "jam": "Senin–Jumat 09.00–17.00 WIB",
-  "alamat": "Jl. Tanah Abang 5 No. 27H, Petojo Selatan, Gambir, Jakarta Pusat 10160",
-  "marketing": {
-    "Papua & Maluku": "0821-7772-7693",
-    "Sulawesi & Kalimantan": "0821-7772-7649",
-    "Nusa Tenggara, Jawa, umum": "0812-9824-2829"
-  },
-  "note": "Satu versi konsisten dari halaman Hubungi Kami situs asli; situs asli berbeda antar halaman, konfirmasi sebelum live."
-}
+{"alamat":"Jl. Tanah Abang 5 No. 27H, Petojo Selatan, Gambir, Jakarta Pusat 10160","call_center":"(021) 3455-420","call_center_intl":"+62213455420","email":"info@mitraperkasacargo.com","jam":"Senin–Jumat 09.00–17.00 WIB","marketing":[{"nomor":"0821-7772-7693","nomor_intl":"6282177727693","wilayah":"Papua & Maluku"},{"nomor":"0821-7772-7649","nomor_intl":"6282177727649","wilayah":"Sulawesi & Kalimantan"},{"nomor":"0812-9824-2829","nomor_intl":"6281298242829","wilayah":"Umum / WhatsApp"}],"marketing_wilayah":[{"nomor_intl":"6282177727693","region":"Papua"},{"nomor_intl":"6282177727693","region":"Maluku"},{"nomor_intl":"6282177727649","region":"Sulawesi"},{"nomor_intl":"6282177727649","region":"Kalimantan"},{"nomor_intl":"6281298242829","region":"Nusa Tenggara"},{"nomor_intl":"6281298242829","region":"Jawa"}],"note":"Satu versi konsisten dari halaman Hubungi Kami situs asli; situs asli berbeda antar halaman, konfirmasi sebelum live.","whatsapp_umum":"0812-9824-2829","whatsapp_umum_intl":"6281298242829"}

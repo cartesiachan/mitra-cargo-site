@@ -1,21 +1,24 @@
 ---
 import Base from '../layouts/Base.astro';
 import tarifData from '../data/tarif.json';
+import konten from '../data/konten.json';
 const rows = tarifData.rows;
-const regions = ['Sulawesi', 'Maluku', 'Papua'];
+const regions = [...new Set(rows.map((r) => r.r))];
+const cityCount = new Set(rows.map((r) => r.c)).size;
+const regionNames = regions.length > 1 ? regions.slice(0, -1).join(', ') + ', dan ' + regions[regions.length - 1] : regions[0];
 const fmt = (n) => 'Rp' + n.toLocaleString('id-ID');
 const svcLabel = (s) => s === 'PELNI' ? 'Via Kapal PELNI' : s === 'RORO' ? 'Via Kapal RORO' : 'Reguler';
 ---
-<Base title="Daftar Harga — Gagian Cargo" description="Daftar harga ekspedisi kargo Jakarta ke Sulawesi, Maluku, dan Papua: tarif per kg via Kapal PELNI/RORO dan Reguler, lengkap dengan estimasi waktu.">
+<Base seoKey="harga">
 <main>
 <section class="tarif-table" id="tarif">
   <div class="wrap">
-    <p class="eyebrow">Daftar Harga · Dummy</p>
-    <h2>Semua tarif, satu tabel. Tidak perlu dicari — ketik saja.</h2>
-    <p>36 kota di Sulawesi, Maluku, dan Papua. Tiap kota punya dua layanan: <b>Via Kapal PELNI/RORO</b> (lebih cepat, tarif lebih tinggi) dan <b>Reguler</b> (lebih hemat, lebih lama).</p>
+    <p class="eyebrow">{konten.harga.eyebrow}</p>
+    <h2>{konten.harga.title}</h2>
+    <p>{cityCount} kota di {regionNames}. Tiap kota punya dua layanan: <b>Via Kapal PELNI/RORO</b> (lebih cepat, tarif lebih tinggi) dan <b>Reguler</b> (lebih hemat, lebih lama).</p>
     <div class="field" style="max-width:420px">
-      <label for="tableFilter">Cari kota di tabel</label>
-      <input id="tableFilter" type="text" placeholder="Contoh: nabire, makassar, ambon" autocomplete="off" />
+      <label for="tableFilter">{konten.harga.filterLabel}</label>
+      <input id="tableFilter" type="text" placeholder={konten.harga.filterPlaceholder} autocomplete="off" />
     </div>
     <div id="tarifTables">
       {regions.map((region) => {
@@ -36,7 +39,7 @@ const svcLabel = (s) => s === 'PELNI' ? 'Via Kapal PELNI' : s === 'RORO' ? 'Via 
         );
       })}
     </div>
-    <p class="fine" id="noTarifResult" hidden>Tidak ada kota yang cocok. Coba kata kunci lain, atau tanyakan tarifnya langsung ke admin via WhatsApp.</p>
+    <p class="fine" id="noTarifResult" hidden>{konten.harga.noResult}</p>
     <p class="fine">Sumber harga: halaman Daftar Harga situs asli Mitra Perkasa Cargo (jadwal-kapal-pelni) — dummy preview. Tarif belum termasuk asuransi (mulai Rp125rb) dan packing (mulai Rp50rb); harga dapat berubah sewaktu-waktu. Estimasi di sumber tertulis &ldquo;hr&rdquo;, dibaca sebagai hari. Catatan: Timika via PELNI tercantum Rp93.000/kg di sumber — jauh di atas Reguler Rp20.000/kg; verifikasi ke admin sebelum live.</p>
   </div>
 </section>
