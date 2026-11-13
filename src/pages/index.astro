@@ -1,24 +1,28 @@
 ---
 import Base from '../layouts/Base.astro';
 import CekOngkir from '../components/CekOngkir.astro';
+import Icon from '../components/Icon.astro';
+import konten from '../data/konten.json';
+import kontak from '../data/kontak.json';
+const brand = konten.brand;
+const waNum = (region: string) => kontak.marketing_wilayah.find((m) => m.region === region)?.nomor_intl ?? kontak.whatsapp_umum_intl;
+const waHero = `https://wa.me/${kontak.whatsapp_umum_intl}?text=${encodeURIComponent(`Halo ${brand}, ${konten.wa.penawaranHero}`)}`;
+const waKonsultasi = `https://wa.me/${kontak.whatsapp_umum_intl}?text=${encodeURIComponent(`Halo ${brand}, ${konten.wa.konsultasi}`)}`;
 ---
-<Base title="Gagian Cargo — Preview Astro | Jasa Ekspedisi Kargo ke Seluruh Indonesia" description="Preview remake Gagian Cargo dengan Astro: jasa ekspedisi pengiriman barang partai besar via laut, darat, dan udara ke Sulawesi, Maluku, Papua, Kalimantan, dan Nusa Tenggara.">
+<Base seoKey="home">
 <main id="beranda">
 <section class="hero" data-astro="static" data-astro-label="STATIC · 0 JS" style="padding-top:56px">
   <div class="wrap hero-grid">
     <div>
-      <p class="eyebrow">Jasa Ekspedisi Kargo · Jakarta</p>
-      <h1>Kirim kargo partai besar ke <em>seluruh Indonesia</em> — laut, darat, dan udara.</h1>
-      <p class="lead">Gagian Cargo melayani pengiriman barang partai besar dengan tarif kompetitif, penanganan profesional, dan pelacakan yang jelas — dari Jakarta ke Indonesia Timur dan seluruh nusantara.</p>
+      <p class="eyebrow">{konten.hero.eyebrow}</p>
+      <h1>{konten.hero.titleBefore}<em>{konten.hero.titleEm}</em>{konten.hero.titleAfter}</h1>
+      <p class="lead">{konten.hero.lead}</p>
       <div class="hero-actions">
-        <a class="btn" href="https://wa.me/6281298242829?text=Halo%20Gagian%20Cargo%2C%20saya%20mau%20minta%20penawaran%20pengiriman%20kargo." target="_blank" rel="noopener">Minta Penawaran via WhatsApp</a>
-        <a class="btn btn-outline" href="#layanan" style="background:transparent;color:#fff;border-color:#94a3b8">Lihat Layanan</a>
+        <a class="btn" href={waHero} target="_blank" rel="noopener">{konten.hero.btnWa}</a>
+        <a class="btn btn-outline" href="#layanan" style="background:transparent;color:#fff;border-color:#94a3b8">{konten.hero.btnLayanan}</a>
       </div>
       <div class="hero-chips">
-        <span class="chip">Tarif kompetitif</span>
-        <span class="chip">Pelacakan jelas</span>
-        <span class="chip">Darat · Laut · Udara</span>
-        <span class="chip">Jakarta → Indonesia Timur</span>
+        {konten.hero.chips.map((chip) => (<span class="chip">{chip}</span>))}
       </div>
     </div>
     <figure class="routemap" aria-label="Peta Indonesia dengan rute pengiriman dari Jakarta">
@@ -63,24 +67,16 @@ import CekOngkir from '../components/CekOngkir.astro';
 <!-- USP -->
 <section data-astro="static" data-astro-label="STATIC · 0 JS">
   <div class="wrap">
-    <p class="eyebrow reveal">Kenapa Gagian Cargo</p>
-    <h2 class="reveal">Tiga alasan bisnis mempercayakan kirimannya ke kami</h2>
+    <p class="eyebrow reveal">Kenapa {brand}</p>
+    <h2 class="reveal">{konten.usp.title}</h2>
     <div class="usp-grid">
+      {konten.usp.items.map((item) => (
       <div class="card reveal">
-        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 6H9.5a3 3 0 000 6h5a3 3 0 010 6H6"/></svg></span>
-        <h3>Tarif Termurah</h3>
-        <p>Biaya kirim kargo kompetitif untuk semua rute, dengan penawaran yang jelas sebelum barang berangkat.</p>
+        <span class="icon" aria-hidden="true"><Icon name={item.icon} /></span>
+        <h3>{item.title}</h3>
+        <p>{item.text}</p>
       </div>
-      <div class="card reveal">
-        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14 0 18M12 3c-3 3.5-3 14 0 18"/></svg></span>
-        <h3>Jangkauan Luas</h3>
-        <p>Melayani Sulawesi, Maluku, Papua, Kalimantan, Nusa Tenggara, dan Jawa — termasuk wilayah Indonesia Timur.</p>
-      </div>
-      <div class="card reveal">
-        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg></span>
-        <h3>Aman &amp; Terpercaya</h3>
-        <p>Ditangani tim profesional dengan sistem pelacakan yang jelas, dari penjemputan sampai serah terima.</p>
-      </div>
+      ))}
     </div>
   </div>
 </section>
@@ -90,28 +86,22 @@ import CekOngkir from '../components/CekOngkir.astro';
   <div class="wrap">
     <div class="about-grid">
       <div class="reveal">
-        <p class="eyebrow">Tentang Kami</p>
-        <h2>Mitra strategis distribusi bisnis Anda</h2>
-        <p class="sub" style="margin-top:10px">Gagian Cargo adalah perusahaan jasa ekspedisi dan logistik di Jakarta dengan jangkauan pengiriman terluas hingga ke seluruh penjuru nusantara. Didukung tim berpengalaman dan jaringan armada yang solid via darat, laut, maupun udara, kami berkomitmen memberikan pengiriman yang cepat, aman, dan tepat waktu.</p>
-        <p class="sub" style="margin-top:10px">Kami menyediakan solusi distribusi logistik partai besar yang efisien dan fleksibel, dengan penawaran tarif yang tetap terjangkau.</p>
+        <p class="eyebrow">{konten.about.eyebrow}</p>
+        <h2>{konten.about.title}</h2>
+        <p class="sub" style="margin-top:10px">{konten.about.para1}</p>
+        <p class="sub" style="margin-top:10px">{konten.about.para2}</p>
         <div class="trust">
-          <div><b>Marketing per wilayah</b>Setiap rute punya nomor sendiri — bukan satu nomor umum.</div>
-          <div><b>Penawaran sebelum berangkat</b>Tarif dihitung dari berat, volume, dan rute. Jelas di awal.</div>
-          <div><b>Indonesia Timur</b>Rute reguler ke Papua, Maluku, dan Sulawesi.</div>
-          <div><b>Partai besar</b>Fokus di kargo besar, bukan paket kecil.</div>
+          {konten.about.trust.map((t) => (<div><b>{t.title}</b>{t.text}</div>))}
         </div>
       </div>
       <figure class="about-photo reveal">
-        <img src="/images/rotterdam-stacks.jpg" alt="Tumpukan kontainer di pelabuhan (foto stok)" loading="lazy">
-        <figcaption>Foto stok: tumpukan kontainer di pelabuhan (Wikimedia Commons). Ganti dengan foto gudang/armada perusahaan.</figcaption>
+        <img src={konten.about.photo.src} alt={konten.about.photo.alt} loading="lazy">
+        <figcaption>{konten.about.photo.caption}</figcaption>
       </figure>
       <div class="about-visual reveal">
-        <h3>Yang kami kerjakan, yang tidak kami klaim</h3>
+        <h3>{konten.about.visualTitle}</h3>
         <ul>
-          <li><b>Kami kerjakan:</b> kargo partai besar via laut, darat, udara dari Jakarta.</li>
-          <li><b>Kami kerjakan:</b> penawaran tarif per rute sebelum barang berangkat.</li>
-          <li><b>Kami kerjakan:</b> pelacakan via admin WhatsApp dengan nomor resi.</li>
-          <li><b>Tidak kami klaim:</b> angka tahun pengalaman, jumlah pelanggan, atau kota — situs asli menampilkan angka 0 di statistiknya, jadi preview ini tidak mengarang angka.</li>
+          {konten.about.visualItems.map((item) => (<li><b>{item.b}</b> {item.text}</li>))}
         </ul>
       </div>
     </div>
@@ -121,59 +111,21 @@ import CekOngkir from '../components/CekOngkir.astro';
 <!-- SERVICES -->
 <section id="layanan" data-astro="static" data-astro-label="STATIC · 0 JS">
   <div class="wrap">
-    <p class="eyebrow reveal">Layanan Kami</p>
-    <h2 class="reveal">Layanan logistik &amp; ekspedisi spesialis</h2>
-    <p class="sub reveal">Pengiriman kargo terpercaya via laut, darat, dan udara ke seluruh wilayah Indonesia dengan tarif murah, aman, dan profesional. Setiap rute punya marketing khusus — tombol di bawah mengarah ke nomor yang tepat.</p>
-    <p class="photo-note">Foto di tiap kartu adalah foto stok Wikimedia Commons — slot ini yang diganti dengan foto asli perusahaan (pelabuhan, kapal, gudang, armada).</p>
+    <p class="eyebrow reveal">{konten.services.eyebrow}</p>
+    <h2 class="reveal">{konten.services.title}</h2>
+    <p class="sub reveal">{konten.services.sub}</p>
+    <p class="photo-note">{konten.services.photoNote}</p>
     <div class="services-grid">
+      {konten.services.items.map((s) => (
       <article class="card service reveal">
-        <div class="service-photo"><img src="/images/port-makassar.jpg" alt="Pelabuhan Soekarno-Hatta, Makassar (foto stok)" loading="lazy"></div>
-        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 15l1.5-6h15L21 15M3 15h18M3 15v4h18v-4M6 19v2M18 19v2"/></svg></span>
-        <p class="mode">Via Laut</p>
-        <h3>Ekspedisi Sulawesi</h3>
-        <p class="cities">Makassar, Kendari, Palu, Manado, dan kota lainnya di Sulawesi.</p>
-        <a class="btn btn-outline" href="https://wa.me/6282177727649?text=Halo%2C%20saya%20mau%20tanya%20tarif%20ekspedisi%20ke%20Sulawesi." target="_blank" rel="noopener">Tanya Tarif — Sulawesi</a>
+        <div class="service-photo"><img src={s.photo} alt={s.photoAlt} loading="lazy"></div>
+        <span class="icon" aria-hidden="true"><Icon name={s.icon} /></span>
+        <p class="mode">{s.mode}</p>
+        <h3>{s.title}</h3>
+        <p class="cities">{s.cities}</p>
+        <a class="btn btn-outline" href={`https://wa.me/${waNum(s.waRegion)}?text=${encodeURIComponent(s.waText)}`} target="_blank" rel="noopener">{s.btnLabel}</a>
       </article>
-      <article class="card service reveal">
-        <div class="service-photo"><img src="/images/reecom-whale.jpg" alt="Kapal kontainer di laut lepas (foto stok)" loading="lazy"></div>
-        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5"/></svg></span>
-        <p class="mode">Via Laut</p>
-        <h3>Ekspedisi Maluku</h3>
-        <p class="cities">Ambon, Tual, Ternate, dan wilayah Maluku lainnya.</p>
-        <a class="btn btn-outline" href="https://wa.me/6282177727693?text=Halo%2C%20saya%20mau%20tanya%20tarif%20ekspedisi%20ke%20Maluku." target="_blank" rel="noopener">Tanya Tarif — Maluku</a>
-      </article>
-      <article class="card service reveal">
-        <div class="service-photo"><img src="/images/kota-jayapura.jpg" alt="Kota Jayapura, Papua (foto stok)" loading="lazy"></div>
-        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 16l20-7-9 13-2-7-9-2z"/></svg></span>
-        <p class="mode">Via Laut · Udara</p>
-        <h3>Ekspedisi Papua</h3>
-        <p class="cities">Jayapura, Sorong, Nabire, Timika, Merauke, dan Biak.</p>
-        <a class="btn btn-outline" href="https://wa.me/6282177727693?text=Halo%2C%20saya%20mau%20tanya%20tarif%20ekspedisi%20ke%20Papua." target="_blank" rel="noopener">Tanya Tarif — Papua</a>
-      </article>
-      <article class="card service reveal">
-        <div class="service-photo"><img src="/images/dvid-barge.jpg" alt="Tongkang pengangkut kargo berat di sungai (foto stok)" loading="lazy"></div>
-        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17h18M5 17V8l7-4 7 4v9M9 17v-4h6v4"/></svg></span>
-        <p class="mode">Via Laut · Darat</p>
-        <h3>Ekspedisi Kalimantan</h3>
-        <p class="cities">Banjarmasin, Samarinda, Balikpapan, serta wilayah Kalimantan lainnya.</p>
-        <a class="btn btn-outline" href="https://wa.me/6282177727649?text=Halo%2C%20saya%20mau%20tanya%20tarif%20ekspedisi%20ke%20Kalimantan." target="_blank" rel="noopener">Tanya Tarif — Kalimantan</a>
-      </article>
-      <article class="card service reveal">
-        <div class="service-photo"><img src="/images/ketapang-ferry.jpg" alt="Pelabuhan feri Ketapang, Jawa Timur (foto stok)" loading="lazy"></div>
-        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
-        <p class="mode">Via Laut</p>
-        <h3>Ekspedisi Nusa Tenggara</h3>
-        <p class="cities">Kupang, Mataram, dan sekitarnya — pengiriman kargo hemat.</p>
-        <a class="btn btn-outline" href="https://wa.me/6281298242829?text=Halo%2C%20saya%20mau%20tanya%20tarif%20ekspedisi%20ke%20Nusa%20Tenggara." target="_blank" rel="noopener">Tanya Tarif — Nusa Tenggara</a>
-      </article>
-      <article class="card service reveal">
-        <div class="service-photo"><img src="/images/motor-ferry.jpg" alt="Sepeda motor di atas kapal feri (foto stok)" loading="lazy"></div>
-        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="17" r="2.5"/><circle cx="18" cy="17" r="2.5"/><path d="M8.5 17h7M6 17l2-6h6l2 3h3"/></svg></span>
-        <p class="mode">Antar Pulau</p>
-        <h3>Jasa Kirim Motor</h3>
-        <p class="cities">Layanan khusus pengiriman kendaraan roda dua antar pulau secara aman.</p>
-        <a class="btn btn-outline" href="https://wa.me/6281298242829?text=Halo%2C%20saya%20mau%20tanya%20tarif%20kirim%20motor%20antar%20pulau." target="_blank" rel="noopener">Tanya Tarif — Kirim Motor</a>
-      </article>
+      ))}
     </div>
   </div>
 </section>
@@ -181,14 +133,13 @@ import CekOngkir from '../components/CekOngkir.astro';
 <!-- PROCESS -->
 <section class="process" data-astro="static" data-astro-label="STATIC · 0 JS">
   <div class="wrap">
-    <p class="eyebrow reveal">Cara Kerja</p>
-    <h2 class="reveal">Dari konsultasi sampai barang sampai, tanpa tebak-tebakan</h2>
-    <p class="sub reveal">Empat langkah yang sama untuk setiap rute, supaya pelanggan tahu persis barangnya sedang di tahap mana.</p>
+    <p class="eyebrow reveal">{konten.process.eyebrow}</p>
+    <h2 class="reveal">{konten.process.title}</h2>
+    <p class="sub reveal">{konten.process.sub}</p>
     <div class="steps">
-      <div class="step reveal"><b class="num">01</b><h3>Konsultasi &amp; penawaran</h3><p>Ceritakan jenis barang, tujuan, dan beratnya. Admin menghitung tarif berdasarkan berat, volume, dan rute.</p></div>
-      <div class="step reveal"><b class="num">02</b><h3>Penjemputan / drop-off</h3><p>Barang dijemput atau diantar ke gudang, dicek kondisinya, lalu dikemas dan didata sebelum berangkat.</p></div>
-      <div class="step reveal"><b class="num">03</b><h3>Pengiriman &amp; pelacakan</h3><p>Barang berangkat via laut, darat, atau udara. Status pengiriman bisa ditanyakan langsung ke admin via WhatsApp.</p></div>
-      <div class="step reveal"><b class="num">04</b><h3>Serah terima</h3><p>Barang sampai di tujuan dan diserahkan ke penerima, dengan kondisi yang dicek saat penerimaan.</p></div>
+      {konten.process.steps.map((step, i) => (
+      <div class="step reveal"><b class="num">{String(i + 1).padStart(2, '0')}</b><h3>{step.title}</h3><p>{step.text}</p></div>
+      ))}
     </div>
   </div>
 </section>
@@ -198,38 +149,25 @@ import CekOngkir from '../components/CekOngkir.astro';
   <div class="wrap">
     <div class="why-top">
       <div class="why-text">
-        <p class="eyebrow reveal">Mengapa Memilih Kami</p>
-        <h2 class="reveal">Yang membedakan kami bukan janji, tapi cara kerjanya</h2>
-        <p class="sub reveal">Gagian Cargo menyediakan layanan pengiriman kargo antarpulau yang cepat, aman, dan terjangkau ke seluruh wilayah Indonesia dengan jangkauan terluas.</p>
+        <p class="eyebrow reveal">{konten.why.eyebrow}</p>
+        <h2 class="reveal">{konten.why.title}</h2>
+        <p class="sub reveal">{konten.why.sub}</p>
         <div class="why-pills reveal">
-          <span class="pill-red">Pengalaman Lebih dari 10 Tahun</span>
-          <span class="pill-red">Layanan Pelanggan 24 Jam</span>
+          {konten.why.pills.map((pill) => (<span class="pill-red">{pill}</span>))}
         </div>
-        <p class="photo-note reveal">Dua klaim di atas dikutip dari situs asli perusahaan. Foto kolase adalah foto asli perusahaan, diambil dari situs mereka.</p>
+        <p class="photo-note reveal">{konten.why.note}</p>
       </div>
       <div class="collage reveal">
-        <figure class="col-tall"><img src="/images/collage-container.jpg" alt="Staf Gagian Cargo di depan kontainer BMPU tujuan Ternate (foto asli perusahaan)" loading="lazy"></figure>
-        <figure><img src="/images/collage-kalimantan.jpg" alt="Staf mengukur dan mengemas barang di gudang (foto asli perusahaan)" loading="lazy"></figure>
-        <figure><img src="/images/collage-team.jpg" alt="Tim Gagian Cargo di depan kontainer di gudang (foto asli perusahaan)" loading="lazy"></figure>
+        {konten.why.collage.map((img) => (<figure class={img.tall ? 'col-tall' : undefined}><img src={img.src} alt={img.alt} loading="lazy"></figure>))}
       </div>
     </div>
     <div class="why-grid">
+      {konten.why.cards.map((card) => (
       <div class="card why reveal">
-        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg></span>
-        <div><h3>Fokus Indonesia Timur</h3><p>Spesialis pengiriman kargo antarpulau, terutama Indonesia Timur, bukan ekspedisi umum serba bisa.</p></div>
+        <span class="icon" aria-hidden="true"><Icon name={card.icon} /></span>
+        <div><h3>{card.title}</h3><p>{card.text}</p></div>
       </div>
-      <div class="card why reveal">
-        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 6H9.5a3 3 0 000 6h5a3 3 0 010 6H6"/></svg></span>
-        <div><h3>Tarif dihitung terbuka</h3><p>Penawaran dibuat sebelum barang berangkat, berdasarkan berat, volume, dan rute — bukan angka yang berubah di tengah jalan.</p></div>
-      </div>
-      <div class="card why reveal">
-        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14 0 18"/></svg></span>
-        <div><h3>Jangkauan Indonesia Timur</h3><p>Rute reguler ke Papua, Maluku, dan Sulawesi — wilayah yang tidak semua ekspedisi layani dengan jadwal yang jelas.</p></div>
-      </div>
-      <div class="card why reveal">
-        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a9 9 0 11-3-6.7M21 3v6h-6"/></svg></span>
-        <div><h3>Admin yang bisa dihubungi</h3><p>Marketing per wilayah, bukan satu nomor umum untuk semua rute. Status kiriman ditanyakan langsung, tidak lewat formulir tanpa balasan.</p></div>
-      </div>
+      ))}
     </div>
   </div>
 </section>
@@ -237,22 +175,16 @@ import CekOngkir from '../components/CekOngkir.astro';
 
 <section class="alt" id="testimoni" data-astro="static" data-astro-label="STATIC · 0 JS">
   <div class="wrap">
-    <p class="eyebrow reveal">Testimoni Pelanggan</p>
-    <h2 class="reveal">Apa kata pelanggan kami</h2>
-    <p class="sub reveal">Testimoni di bawah ini diringkas dari testimoni yang dipublikasikan di situs asli, dengan rute pengiriman sebagai konteksnya. Foto profil diganti inisial — situs asli memakai foto rute sebagai foto pelanggan.</p>
+    <p class="eyebrow reveal">{konten.testimonials.eyebrow}</p>
+    <h2 class="reveal">{konten.testimonials.title}</h2>
+    <p class="sub reveal">{konten.testimonials.intro}</p>
     <div class="testi-grid">
+      {konten.testimonials.items.map((t) => (
       <div class="card reveal">
-        <p class="quote">“Pengiriman kargo Jakarta–Jayapura tepat waktu, barang aman tanpa cacat, dan ongkirnya jauh lebih hemat dibanding yang lain. Pelayanannya profesional dan responsif.”</p>
-        <div class="who"><span class="avatar">HW</span><span><b>Hendra Wijaya</b><span>Jakarta → Jayapura, Papua</span></span></div>
+        <p class="quote">“{t.quote}”</p>
+        <div class="who"><span class="avatar">{t.initials}</span><span><b>{t.name}</b><span>{t.route}</span></span></div>
       </div>
-      <div class="card reveal">
-        <p class="quote">“Kirim barang partai besar ke Maluku via laut lancar, barang sampai dengan selamat, dan adminnya ramah. Recommended buat pelaku bisnis.”</p>
-        <div class="who"><span class="avatar">SM</span><span><b>Siska Meliana</b><span>Jakarta → Maluku</span></span></div>
-      </div>
-      <div class="card reveal">
-        <p class="quote">“Sempat khawatir kirim barang dalam jumlah banyak ke luar pulau. Pelayanannya memuaskan, barang tiba dalam kondisi baik, dan biayanya bersaing.”</p>
-        <div class="who"><span class="avatar">BS</span><span><b>Budi Santoso</b><span>Jakarta → Luar Pulau</span></span></div>
-      </div>
+      ))}
     </div>
   </div>
 </section>
@@ -260,43 +192,38 @@ import CekOngkir from '../components/CekOngkir.astro';
 <!-- FAQ -->
 <section data-astro="static" data-astro-label="STATIC · 0 JS">
   <div class="wrap faq">
-    <p class="eyebrow reveal" style="text-align:center">Tanya Jawab</p>
-    <h2 class="reveal" style="text-align:center;margin-bottom:24px">Pertanyaan yang sering ditanyakan</h2>
-    <details class="reveal"><summary>Bagaimana cara memesan pengiriman kargo?</summary><p>Hubungi admin via WhatsApp dengan tujuan, jenis barang, dan perkiraan berat atau volumenya. Admin akan menghitung tarif dan jadwal keberangkatan, lalu mengarahkan proses penjemputan atau drop-off barang.</p></details>
-    <details class="reveal"><summary>Apakah tarif dihitung per kilogram?</summary><p>Tarif dihitung berdasarkan berat, volume, rute, dan moda pengiriman (laut, darat, atau udara). Karena itu tarif pasti baru bisa diberikan setelah admin mengetahui detail barang dan tujuannya.</p></details>
-    <details class="reveal"><summary>Bagaimana cara melacak kiriman saya?</summary><p>Simpan nomor resi Anda, lalu tanyakan status terbarunya ke admin via WhatsApp menggunakan tombol Lacak Kiriman di atas. Preview ini tidak menampilkan status palsu — status asli dicek langsung ke admin.</p></details>
-    <details class="reveal"><summary>Wilayah mana saja yang dilayani?</summary><p>Utamanya Sulawesi, Maluku, Papua, Kalimantan, Nusa Tenggara, dan Jawa, dengan titik keberangkatan dari Jakarta. Untuk tujuan di luar daftar tersebut, tanyakan langsung ke admin.</p></details>
+    <p class="eyebrow reveal" style="text-align:center">{konten.faq.eyebrow}</p>
+    <h2 class="reveal" style="text-align:center;margin-bottom:24px">{konten.faq.title}</h2>
+    {konten.faq.items.map((item) => (<details class="reveal"><summary>{item.q}</summary><p>{item.a}</p></details>))}
   </div>
 </section>
 
 <!-- CTA + CONTACT -->
 <section class="cta" id="kontak" style="padding-bottom:32px" data-astro="static" data-astro-label="STATIC · 0 JS">
   <div class="wrap">
-    <h2 class="reveal">Hubungi kami sekarang juga</h2>
-    <p class="reveal">Jangan ragu menghubungi kami. Konsultasikan kebutuhan pengiriman Anda dan dapatkan informasi biaya serta solusi pengiriman terbaik.</p>
-    <a class="btn btn-green" href="https://wa.me/6281298242829?text=Halo%20Gagian%20Cargo%2C%20saya%20mau%20konsultasi%20pengiriman%20kargo." target="_blank" rel="noopener">Chat WhatsApp — 0812-9824-2829</a>
-    <a class="btn" href="tel:+62213455420" style="margin-left:8px">Telepon (021) 3455-420</a>
+    <h2 class="reveal">{konten.cta.title}</h2>
+    <p class="reveal">{konten.cta.text}</p>
+    <a class="btn btn-green" href={waKonsultasi} target="_blank" rel="noopener">Chat WhatsApp — {kontak.whatsapp_umum}</a>
+    <a class="btn" href={`tel:${kontak.call_center_intl}`} style="margin-left:8px">Telepon {kontak.call_center}</a>
   </div>
 </section>
 
 <section style="padding-top:32px" data-astro="static" data-astro-label="STATIC · 0 JS">
   <div class="wrap contact-grid">
     <div class="card contact-box">
-      <h3>Marketing per Wilayah</h3>
-      <p><b>Papua &amp; Maluku</b><br><a href="https://wa.me/6282177727693" target="_blank" rel="noopener">0821-7772-7693</a></p>
-      <p><b>Sulawesi &amp; Kalimantan</b><br><a href="https://wa.me/6282177727649" target="_blank" rel="noopener">0821-7772-7649</a></p>
-      <p><b>Umum / WhatsApp</b><br><a href="https://wa.me/6281298242829" target="_blank" rel="noopener">0812-9824-2829</a></p>
+      <h3>{konten.contact.marketingTitle}</h3>
+      {kontak.marketing.map((m) => (<p><b>{m.wilayah}</b><br><a href={`https://wa.me/${m.nomor_intl}`} target="_blank" rel="noopener">{m.nomor}</a></p>))}
     </div>
     <div class="card contact-box">
-      <h3>Kantor</h3>
-      <p>Jl. Tanah Abang 5 No. 27H, Petojo Selatan, Gambir, Jakarta Pusat 10160</p>
-      <p><b>Email:</b> <a href="mailto:info@mitraperkasacargo.com">info@mitraperkasacargo.com</a></p>
-      <p><b>Jam operasional:</b> Senin–Jumat 09.00–17.00 WIB</p>
+      <h3>{konten.contact.kantorTitle}</h3>
+      <p>{kontak.alamat}</p>
+      <p><b>Email:</b> <a href={`mailto:${kontak.email}`}>{kontak.email}</a></p>
+      <p><b>Jam operasional:</b> {kontak.jam}</p>
     </div>
     <div class="card contact-box">
-      <h3>Layanan</h3>
-      <p>Ekspedisi Sulawesi, Maluku, Papua, Kalimantan, dan Nusa Tenggara, plus jasa kirim motor antar pulau.</p>
-      <p>Pengiriman via laut, darat, dan udara untuk barang partai besar.</p>
+      <h3>{konten.contact.layananTitle}</h3>
+      <p>{konten.contact.layananText1}</p>
+      <p>{konten.contact.layananText2}</p>
     </div>
   </div>
 </section>

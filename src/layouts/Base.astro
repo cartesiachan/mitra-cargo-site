@@ -1,14 +1,29 @@
 ---
-interface Props { title: string; description: string; }
-const { title, description } = Astro.props;
+import konten from '../data/konten.json';
+import kontak from '../data/kontak.json';
+import seo from '../data/seo.json';
+interface Props { seoKey: 'home' | 'harga'; }
+const { seoKey } = Astro.props;
+const page = seo[seoKey];
+const brand = konten.brand;
+const waUmum = `https://wa.me/${kontak.whatsapp_umum_intl}?text=${encodeURIComponent(`Halo ${brand}, ${konten.wa.penawaran}`)}`;
+const year = new Date().getFullYear();
 ---
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{title}</title>
-<meta name="description" content={description}>
+<title>{page.title}</title>
+<meta name="description" content={page.description}>
+<meta property="og:type" content="website">
+<meta property="og:title" content={page.ogTitle}>
+<meta property="og:description" content={page.ogDescription}>
+{page.ogImage && <meta property="og:image" content={page.ogImage}>}
+{page.ogImage && <meta name="twitter:card" content="summary_large_image">}
+{seo.gscVerification && <meta name="google-site-verification" content={seo.gscVerification}>}
+{seo.ga4Id && <script async src={`https://www.googletagmanager.com/gtag/js?id=${seo.ga4Id}`}></script>}
+{seo.ga4Id && <script set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${seo.ga4Id}');`}></script>}
 <style is:global>
 /* Gagian Cargo — Astro build (from approved v3 preview). Global styles. */
 *{box-sizing:border-box;margin:0;padding:0}
@@ -274,26 +289,21 @@ footer.site{background:#111;color:#fff;padding:48px 0 0}
 
 <div class="topbar">
   <div class="wrap">
-    <span>Senin–Jumat 09.00–17.00 WIB</span>
-    <span>Call Center: <a href="tel:+62213455420">(021) 3455-420</a> &nbsp;·&nbsp; WhatsApp: <a href="https://wa.me/6281298242829" target="_blank" rel="noopener">0812-9824-2829</a> &nbsp;·&nbsp; <a href="mailto:info@mitraperkasacargo.com">info@mitraperkasacargo.com</a></span>
+    <span>{kontak.jam}</span>
+    <span>Call Center: <a href={`tel:${kontak.call_center_intl}`}>{kontak.call_center}</a> &nbsp;·&nbsp; WhatsApp: <a href={`https://wa.me/${kontak.whatsapp_umum_intl}`} target="_blank" rel="noopener">{kontak.whatsapp_umum}</a> &nbsp;·&nbsp; <a href={`mailto:${kontak.email}`}>{kontak.email}</a></span>
   </div>
 </div>
 
 <header class="site" data-astro="static" data-astro-label="STATIC · 0 JS">
   <div class="wrap">
-    <a class="logo" href="/" aria-label="Gagian Cargo — Beranda">
+    <a class="logo" href="/" aria-label={`${brand} — Beranda`}>
       <span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 15l1.5-6h15L21 15M3 15h18M3 15v4h18v-4M6 19v2M18 19v2M12 9V4M12 4l-2 2M12 4l2 2"/></svg></span>
-      <span><b>GAGIAN CARGO</b><small>EKSPEDISI KARGO · JAKARTA</small></span>
+      <span><b>{brand.toUpperCase()}</b><small>{konten.tagline}</small></span>
     </a>
     <button class="menu-toggle" id="menuToggle" aria-expanded="false">Menu</button>
     <nav class="main" id="mainNav" aria-label="Navigasi utama">
-      <a href="/#beranda">Beranda</a>
-      <a href="/#tentang">Tentang</a>
-      <a href="/#layanan">Layanan</a>
-      <a href="/daftar-harga">Daftar Harga</a>
-      <a href="/#testimoni">Testimoni</a>
-      <a href="/#kontak">Hubungi Kami</a>
-      <a class="btn" href="https://wa.me/6281298242829?text=Halo%20Gagian%20Cargo%2C%20saya%20mau%20tanya%20tarif%20pengiriman%20kargo." target="_blank" rel="noopener">Minta Penawaran</a>
+      {konten.nav.map((item) => (<a href={item.href}>{item.label}</a>))}
+      <a class="btn" href={waUmum} target="_blank" rel="noopener">{konten.navCta}</a>
     </nav>
   </div>
 </header>
@@ -304,37 +314,28 @@ footer.site{background:#111;color:#fff;padding:48px 0 0}
   <div class="wrap">
     <div class="foot-grid">
       <div>
-        <h3>GAGIAN CARGO</h3>
-        <p>Jasa ekspedisi kargo Indonesia Timur yang profesional — pengiriman cepat, murah, aman, dan terpercaya.</p>
-        <p style="margin-top:10px">Call center: (021) 3455-420</p>
+        <h3>{brand.toUpperCase()}</h3>
+        <p>{konten.footer.tagline}</p>
+        <p style="margin-top:10px">Call center: {kontak.call_center}</p>
       </div>
       <div>
         <h3>Navigasi</h3>
-        <a href="/#beranda">Beranda</a>
-        <a href="/#tentang">Tentang Kami</a>
-        <a href="/#layanan">Layanan</a>
-        <a href="/daftar-harga">Tarif &amp; Lacak Kiriman</a>
-        <a href="/#kontak">Hubungi Kami</a>
+        {konten.footer.nav.map((item) => (<a href={item.href}>{item.label}</a>))}
       </div>
       <div>
         <h3>Layanan</h3>
-        <a href="/#layanan">Ekspedisi Sulawesi</a>
-        <a href="/#layanan">Ekspedisi Maluku</a>
-        <a href="/#layanan">Ekspedisi Papua</a>
-        <a href="/#layanan">Ekspedisi Kalimantan</a>
-        <a href="/#layanan">Ekspedisi Nusa Tenggara</a>
-        <a href="/#layanan">Jasa Kirim Motor</a>
+        {konten.services.items.map((s) => (<a href="/#layanan">{s.title}</a>))}
       </div>
     </div>
     <div class="bottom">
-      <span>© 2026 Gagian Cargo</span>
+      <span>© {year} {brand}</span>
       <span>Foto: Wikimedia Commons — Kapal kontainer di Koper (CC0); tumpukan kontainer Rotterdam, terminal Bremerhaven, Pelabuhan Makassar, kapal Reecon Whale, Kota Jayapura, tongkang DVIDS (domain publik), Pelabuhan Ketapang, motor di feri Sankta Maria (CC BY-SA). Semua foto stok, bukan foto perusahaan.</span>
       <span>Remake Astro. Konten dari situs asli + preview 6 Nov. Data kontak memakai satu versi konsisten — situs asli berbeda antar halaman, jadi konfirmasi sebelum dipakai live. Statistik angka sengaja tidak ditampilkan (situs asli menampilkan 0).</span>
     </div>
   </div>
 </footer>
 
-<a class="sticky-cta" href="https://wa.me/6281298242829?text=Halo%20Gagian%20Cargo%2C%20saya%20mau%20tanya%20tarif%20pengiriman%20kargo." target="_blank" rel="noopener">Chat WhatsApp — Minta Penawaran</a>
+<a class="sticky-cta" href={waUmum} target="_blank" rel="noopener">Chat WhatsApp — {konten.navCta}</a>
 
 <script>
 

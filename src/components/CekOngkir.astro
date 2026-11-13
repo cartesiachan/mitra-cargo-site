@@ -49,17 +49,19 @@
 
 <script>
 import tarifData from '../data/tarif.json';
+import kontenData from '../data/konten.json';
+import kontakData from '../data/kontak.json';
 const TARIF = tarifData.rows;
+const BRAND = kontenData.brand;
+const WA_UMUM = kontakData.whatsapp_umum_intl;
+const MARKETING = {};
+kontakData.marketing_wilayah.forEach(function(m){ MARKETING[m.region] = m.nomor_intl; });
+const REGIONS = [];
+TARIF.forEach(function(r){ if(REGIONS.indexOf(r.r) === -1) REGIONS.push(r.r); });
+const REGION_NAMES = REGIONS.length > 1 ? REGIONS.slice(0, -1).join(', ') + ', dan ' + REGIONS[REGIONS.length - 1] : REGIONS[0];
 (function(){
-// Marketing number per region (from the original Hubungi Kami page)
-  var marketing = {
-    'Papua': '6282177727693',
-    'Maluku': '6282177727693',
-    'Sulawesi': '6282177727649',
-    'Kalimantan': '6282177727649',
-    'Nusa Tenggara': '6281298242829',
-    'Jawa': '6281298242829'
-  };
+  // Marketing number per region (from kontak.json — editable via dashboard)
+  var marketing = MARKETING;
 
   // Tariff dataset (dummy preview) — transcribed from Mitra's own price
   // pages: jadwal-kapal-pelni/harga-ongkos-kirim-{makassar,maluku,papua}/
@@ -129,21 +131,21 @@ const TARIF = tarifData.rows;
       || null;
     if(!city){
       var typed = esc(toInput.value.trim());
-      var text0 = 'Halo Gagian Cargo, saya mau tanya ongkir Jakarta ke '
+      var text0 = 'Halo ' + BRAND + ', saya mau tanya ongkir Jakarta ke '
         + (toInput.value.trim() || '(kota tujuan)')
         + '. Mohon info tarif dan jadwalnya. Terima kasih.';
       cekResult.style.display = 'block';
       cekResult.innerHTML = '<b>Kota ' + (typed ? '&ldquo;' + typed + '&rdquo;' : 'tujuan')
-        + ' tidak ada di daftar harga dummy ini.</b> Daftar ini mencakup 36 kota di Sulawesi, Maluku, dan Papua. '
+        + ' tidak ada di daftar harga dummy ini.</b> Daftar ini mencakup ' + cities.length + ' kota di ' + REGION_NAMES + '. '
         + 'Tarif kota lain bisa ditanyakan langsung ke admin.'
-        + '<br><a class="btn btn-green" style="margin-top:10px" href="https://wa.me/6281298242829?text='
+        + '<br><a class="btn btn-green" style="margin-top:10px" href="https://wa.me/' + WA_UMUM + '?text='
         + encodeURIComponent(text0) + '" target="_blank" rel="noopener">Tanya Tarif via WhatsApp</a>';
       return;
     }
     var rows = TARIF.filter(function(r){ return r.c === city.c; });
     var w = parseFloat(weightInput.value);
     var hasW = !isNaN(w) && w > 0;
-    var num = marketing[city.r] || '6281298242829';
+    var num = marketing[city.r] || WA_UMUM;
     var html = '<b>Jakarta &rarr; ' + esc(city.c) + ' (' + esc(city.r) + ')</b>';
     rows.forEach(function(r){
       var chargeKg = Math.max(hasW ? w : 0, r.min);
@@ -159,7 +161,7 @@ const TARIF = tarifData.rows;
         + '<span style="font-size:13px;font-weight:400">/kg</span></div></div>';
     });
     var svc = rows.map(function(r){ return r.s + ' ' + fmt(r.price) + '/kg'; }).join(', ');
-    var text = 'Halo Gagian Cargo, saya mau kirim dari Jakarta ke ' + city.c
+    var text = 'Halo ' + BRAND + ', saya mau kirim dari Jakarta ke ' + city.c
       + ' (' + city.r + '). Tarif: ' + svc + '.'
       + (hasW ? ' Berat: ' + w + ' kg.' : '')
       + ' Mohon info jadwal keberangkatan dan cara bookingnya. Terima kasih.';
@@ -196,8 +198,8 @@ const TARIF = tarifData.rows;
       trackResult.innerHTML = '<b>Masukkan nomor resi dulu.</b> Nomor resi biasanya diberikan admin setelah barang berangkat.';
       return;
     }
-    var text = 'Halo Gagian Cargo, saya mau cek status kiriman dengan nomor resi: ' + resi + '. Mohon info posisi dan perkiraan tibanya. Terima kasih.';
-    var url = 'https://wa.me/6281298242829?text=' + encodeURIComponent(text);
+    var text = 'Halo ' + BRAND + ', saya mau cek status kiriman dengan nomor resi: ' + resi + '. Mohon info posisi dan perkiraan tibanya. Terima kasih.';
+    var url = 'https://wa.me/' + WA_UMUM + '?text=' + encodeURIComponent(text);
     trackResult.style.display = 'block';
     trackResult.innerHTML = '<b>Resi ' + esc(resi) + ' siap dicek.</b>'
       + 'Status terbaru dicek langsung ke admin &mdash; preview ini tidak menampilkan data pelacakan palsu.'
