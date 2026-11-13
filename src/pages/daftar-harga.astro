@@ -1,0 +1,66 @@
+---
+import Base from '../layouts/Base.astro';
+import tarifData from '../data/tarif.json';
+const rows = tarifData.rows;
+const regions = ['Sulawesi', 'Maluku', 'Papua'];
+const fmt = (n) => 'Rp' + n.toLocaleString('id-ID');
+const svcLabel = (s) => s === 'PELNI' ? 'Via Kapal PELNI' : s === 'RORO' ? 'Via Kapal RORO' : 'Reguler';
+---
+<Base title="Daftar Harga — Gagian Cargo" description="Daftar harga ekspedisi kargo Jakarta ke Sulawesi, Maluku, dan Papua: tarif per kg via Kapal PELNI/RORO dan Reguler, lengkap dengan estimasi waktu.">
+<main>
+<section class="tarif-table" id="tarif">
+  <div class="wrap">
+    <p class="eyebrow">Daftar Harga · Dummy</p>
+    <h2>Semua tarif, satu tabel. Tidak perlu dicari — ketik saja.</h2>
+    <p>36 kota di Sulawesi, Maluku, dan Papua. Tiap kota punya dua layanan: <b>Via Kapal PELNI/RORO</b> (lebih cepat, tarif lebih tinggi) dan <b>Reguler</b> (lebih hemat, lebih lama).</p>
+    <div class="field" style="max-width:420px">
+      <label for="tableFilter">Cari kota di tabel</label>
+      <input id="tableFilter" type="text" placeholder="Contoh: nabire, makassar, ambon" autocomplete="off" />
+    </div>
+    <div id="tarifTables">
+      {regions.map((region) => {
+        const list = rows.filter((r) => r.r === region).sort((a, b) => a.c.localeCompare(b.c) || ((a.s === 'Reguler' ? 1 : 0) - (b.s === 'Reguler' ? 1 : 0)));
+        const cityCount = new Set(list.map((r) => r.c)).size;
+        return (
+          <div class="tarif-group">
+            <h3>{region} — {cityCount} kota</h3>
+            <div class="table-scroll"><table>
+              <thead><tr><th>Kota Tujuan</th><th>Layanan</th><th>Min.</th><th>Tarif/Kg</th><th>Estimasi</th><th>Keterangan</th></tr></thead>
+              <tbody>
+                {list.map((r) => (
+                  <tr><td>{r.c}</td><td>{svcLabel(r.s)}</td><td>{r.min} kg</td><td>{fmt(r.price)}</td><td>{r.eta}</td><td>{r.note}</td></tr>
+                ))}
+              </tbody>
+            </table></div>
+          </div>
+        );
+      })}
+    </div>
+    <p class="fine" id="noTarifResult" hidden>Tidak ada kota yang cocok. Coba kata kunci lain, atau tanyakan tarifnya langsung ke admin via WhatsApp.</p>
+    <p class="fine">Sumber harga: halaman Daftar Harga situs asli Mitra Perkasa Cargo (jadwal-kapal-pelni) — dummy preview. Tarif belum termasuk asuransi (mulai Rp125rb) dan packing (mulai Rp50rb); harga dapat berubah sewaktu-waktu. Estimasi di sumber tertulis &ldquo;hr&rdquo;, dibaca sebagai hari. Catatan: Timika via PELNI tercantum Rp93.000/kg di sumber — jauh di atas Reguler Rp20.000/kg; verifikasi ke admin sebelum live.</p>
+  </div>
+</section>
+</main>
+<script>
+(function(){
+  var tf = document.getElementById('tableFilter');
+  var noRes = document.getElementById('noTarifResult');
+  function norm(s){ return String(s).toLowerCase().replace(/[^a-z0-9 ]/g,'').trim(); }
+  if(!tf) return;
+  tf.addEventListener('input', function(){
+    var q = norm(tf.value);
+    document.querySelectorAll('#tarifTables tbody tr').forEach(function(tr){
+      tr.style.display = (!q || norm(tr.textContent).indexOf(q) !== -1) ? '' : 'none';
+    });
+    var anyGroup = false;
+    document.querySelectorAll('#tarifTables .tarif-group').forEach(function(g){
+      var visible = 0;
+      g.querySelectorAll('tbody tr').forEach(function(tr){ if(tr.style.display !== 'none') visible++; });
+      g.style.display = visible ? '' : 'none';
+      if(visible) anyGroup = true;
+    });
+    if(noRes) noRes.hidden = anyGroup;
+  });
+})();
+</script>
+</Base>

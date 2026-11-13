@@ -1,0 +1,209 @@
+<div class="hero-tool" id="tarif" data-astro="island" data-astro-label="ISLAND · JS DI SINI">
+      <span class="island-tag">ISLAND — interaktif</span>
+      <div class="hero-tabs" role="tablist" aria-label="Alat pengiriman">
+        <button type="button" class="hero-tab active" id="tabCek" role="tab" aria-selected="true">Cek Ongkir</button>
+        <button type="button" class="hero-tab" id="tabLacak" role="tab" aria-selected="false">Lacak Resi</button>
+      </div>
+      <div id="panelCek" role="tabpanel" aria-labelledby="tabCek">
+        <p class="hero-tool-sub">Ketik kota tujuan — harga Jakarta ke sana langsung muncul, PELNI/RORO dan Reguler sekaligus. Pemberangkatan hanya dari Jakarta.</p>
+        <div class="hero-tool-grid">
+          <div class="field">
+            <label for="fromCity">Dari</label>
+            <input id="fromCity" type="text" value="Jakarta" disabled>
+          </div>
+          <div class="field" style="position:relative">
+            <label for="toCity">Ke — ketik kota tujuan</label>
+            <input id="toCity" type="text" placeholder="Contoh: Nabire" autocomplete="off">
+            <div class="suggest" id="suggest" hidden></div>
+          </div>
+          <div class="field">
+            <label for="heroWeight">Berat (kg, opsional)</label>
+            <input id="heroWeight" type="number" min="1" placeholder="Contoh: 100">
+          </div>
+        </div>
+        <div class="hero-tool-row">
+          <button class="btn" id="cekBtn" type="button">Cek Ongkir</button>
+          <span class="hero-tool-hint">Kota populer:</span>
+          <button type="button" class="popchip" data-city="Nabire">Nabire</button>
+          <button type="button" class="popchip" data-city="Jayapura">Jayapura</button>
+          <button type="button" class="popchip" data-city="Makassar">Makassar</button>
+          <button type="button" class="popchip" data-city="Ambon">Ambon</button>
+          <button type="button" class="popchip" data-city="Sorong">Sorong</button>
+          <button type="button" class="popchip" data-city="Ternate">Ternate</button>
+        </div>
+        <div class="tool-result" id="cekResult" role="status"></div>
+      </div>
+      <div id="panelLacak" role="tabpanel" aria-labelledby="tabLacak" hidden>
+        <p class="hero-tool-sub">Masukkan nomor resi Anda. Status terbaru dicek langsung ke admin via WhatsApp — preview ini tidak menampilkan data pelacakan palsu.</p>
+        <div class="field">
+          <label for="resi">Nomor resi</label>
+          <input id="resi" type="text" placeholder="Contoh: GAG-2026-000123" autocomplete="off">
+        </div>
+        <div class="hero-tool-row">
+          <button class="btn" id="trackBtn" type="button">Lacak via WhatsApp</button>
+        </div>
+        <div class="tool-result" id="trackResult" role="status"></div>
+      </div>
+      <p class="hero-tool-note">Harga referensi dari halaman Daftar Harga situs Mitra Perkasa Cargo (jadwal-kapal-pelni) — dummy preview, konfirmasi ke admin sebelum live.</p>
+    </div>
+
+<script>
+import tarifData from '../data/tarif.json';
+const TARIF = tarifData.rows;
+(function(){
+// Marketing number per region (from the original Hubungi Kami page)
+  var marketing = {
+    'Papua': '6282177727693',
+    'Maluku': '6282177727693',
+    'Sulawesi': '6282177727649',
+    'Kalimantan': '6282177727649',
+    'Nusa Tenggara': '6281298242829',
+    'Jawa': '6281298242829'
+  };
+
+  // Tariff dataset (dummy preview) — transcribed from Mitra's own price
+  // pages: jadwal-kapal-pelni/harga-ongkos-kirim-{makassar,maluku,papua}/
+    var fmt = function(n){ return 'Rp' + n.toLocaleString('id-ID'); };
+  var esc = function(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+  var norm = function(s){ return String(s).toLowerCase().replace(/[^a-z0-9 ]/g,'').trim(); };
+
+  // Unique cities, sorted
+  var cities = [];
+  var seen = {};
+  TARIF.forEach(function(r){
+    var k = r.c + '|' + r.r;
+    if(!seen[k]){ seen[k] = 1; cities.push({c: r.c, r: r.r}); }
+  });
+  cities.sort(function(a,b){ return a.c.localeCompare(b.c); });
+
+  // Tabs: Cek Ongkir / Lacak Resi
+  var tabCek = document.getElementById('tabCek');
+  var tabLacak = document.getElementById('tabLacak');
+  var panelCek = document.getElementById('panelCek');
+  var panelLacak = document.getElementById('panelLacak');
+  function showTab(which){
+    var cek = which === 'cek';
+    tabCek.classList.toggle('active', cek);
+    tabLacak.classList.toggle('active', !cek);
+    tabCek.setAttribute('aria-selected', cek ? 'true' : 'false');
+    tabLacak.setAttribute('aria-selected', !cek ? 'true' : 'false');
+    panelCek.hidden = !cek;
+    panelLacak.hidden = cek;
+  }
+  tabCek.addEventListener('click', function(){ showTab('cek'); });
+  tabLacak.addEventListener('click', function(){ showTab('lacak'); });
+
+  // Autocomplete for destination
+  var toInput = document.getElementById('toCity');
+  var suggest = document.getElementById('suggest');
+  function closeSuggest(){ suggest.hidden = true; suggest.innerHTML = ''; }
+  toInput.addEventListener('input', function(){
+    var q = norm(toInput.value);
+    if(q.length < 2){ closeSuggest(); return; }
+    var matches = cities.filter(function(x){ return norm(x.c).indexOf(q) !== -1; }).slice(0, 6);
+    if(!matches.length){ closeSuggest(); return; }
+    suggest.innerHTML = matches.map(function(x){
+      return '<button type="button" data-city="' + esc(x.c) + '">' + esc(x.c) + ' <span>&middot; ' + esc(x.r) + '</span></button>';
+    }).join('');
+    suggest.hidden = false;
+  });
+  suggest.addEventListener('click', function(e){
+    var b = e.target.closest('button[data-city]');
+    if(!b) return;
+    toInput.value = b.getAttribute('data-city');
+    closeSuggest();
+    toInput.focus();
+  });
+  document.addEventListener('click', function(e){
+    if(!e.target.closest('#toCity') && !e.target.closest('#suggest')) closeSuggest();
+  });
+
+  // Cek Ongkir: show PELNI/RORO + Reguler for the city, with total if weight given
+  var cekBtn = document.getElementById('cekBtn');
+  var cekResult = document.getElementById('cekResult');
+  var weightInput = document.getElementById('heroWeight');
+  function doCek(){
+    var q = norm(toInput.value);
+    var city = cities.find(function(x){ return norm(x.c) === q; })
+      || cities.find(function(x){ return norm(x.c).indexOf(q) === 0; })
+      || null;
+    if(!city){
+      var typed = esc(toInput.value.trim());
+      var text0 = 'Halo Gagian Cargo, saya mau tanya ongkir Jakarta ke '
+        + (toInput.value.trim() || '(kota tujuan)')
+        + '. Mohon info tarif dan jadwalnya. Terima kasih.';
+      cekResult.style.display = 'block';
+      cekResult.innerHTML = '<b>Kota ' + (typed ? '&ldquo;' + typed + '&rdquo;' : 'tujuan')
+        + ' tidak ada di daftar harga dummy ini.</b> Daftar ini mencakup 36 kota di Sulawesi, Maluku, dan Papua. '
+        + 'Tarif kota lain bisa ditanyakan langsung ke admin.'
+        + '<br><a class="btn btn-green" style="margin-top:10px" href="https://wa.me/6281298242829?text='
+        + encodeURIComponent(text0) + '" target="_blank" rel="noopener">Tanya Tarif via WhatsApp</a>';
+      return;
+    }
+    var rows = TARIF.filter(function(r){ return r.c === city.c; });
+    var w = parseFloat(weightInput.value);
+    var hasW = !isNaN(w) && w > 0;
+    var num = marketing[city.r] || '6281298242829';
+    var html = '<b>Jakarta &rarr; ' + esc(city.c) + ' (' + esc(city.r) + ')</b>';
+    rows.forEach(function(r){
+      var chargeKg = Math.max(hasW ? w : 0, r.min);
+      var total = hasW ? r.price * chargeKg : null;
+      var label = r.s === 'Reguler' ? 'Reguler &mdash; hemat'
+        : (r.s === 'RORO' ? 'Via Kapal RORO &mdash; cepat' : 'Via Kapal PELNI &mdash; cepat');
+      html += '<div class="opt"><div><b>' + label + '</b><br><span>'
+        + fmt(r.price) + '/kg &middot; min. ' + r.min + ' kg &middot; estimasi ' + esc(r.eta)
+        + ' &middot; ' + esc(r.note) + '</span>'
+        + (hasW ? '<br><span>Berat dihitung: ' + chargeKg + ' kg (min. ' + r.min
+          + ' kg) &rarr; estimasi <b>' + fmt(total) + '</b></span>' : '')
+        + '</div><div class="price">' + fmt(r.price)
+        + '<span style="font-size:13px;font-weight:400">/kg</span></div></div>';
+    });
+    var svc = rows.map(function(r){ return r.s + ' ' + fmt(r.price) + '/kg'; }).join(', ');
+    var text = 'Halo Gagian Cargo, saya mau kirim dari Jakarta ke ' + city.c
+      + ' (' + city.r + '). Tarif: ' + svc + '.'
+      + (hasW ? ' Berat: ' + w + ' kg.' : '')
+      + ' Mohon info jadwal keberangkatan dan cara bookingnya. Terima kasih.';
+    html += '<a class="btn btn-green" style="margin-top:12px" href="https://wa.me/' + num
+      + '?text=' + encodeURIComponent(text)
+      + '" target="_blank" rel="noopener">Pesan / Tanya via WhatsApp</a>';
+    html += '<div class="fine" style="margin-top:8px">Tarif belum termasuk asuransi (mulai Rp125rb) dan packing (mulai Rp50rb). Harga dapat berubah sewaktu-waktu.</div>';
+    cekResult.style.display = 'block';
+    cekResult.innerHTML = html;
+  }
+  cekBtn.addEventListener('click', function(){ closeSuggest(); doCek(); });
+  toInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); closeSuggest(); doCek(); }
+    if(e.key === 'Escape') closeSuggest();
+  });
+
+  // Popular-city chips: fill + check immediately
+  document.querySelectorAll('.popchip').forEach(function(b){
+    b.addEventListener('click', function(){
+      toInput.value = b.getAttribute('data-city');
+      closeSuggest();
+      doCek();
+      cekResult.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+    });
+  });
+
+  // Tracking tool: no fake tracking data. Ask admin with the resi number.
+  var trackBtn = document.getElementById('trackBtn');
+  var trackResult = document.getElementById('trackResult');
+  trackBtn.addEventListener('click', function(){
+    var resi = document.getElementById('resi').value.trim();
+    if(!resi){
+      trackResult.style.display = 'block';
+      trackResult.innerHTML = '<b>Masukkan nomor resi dulu.</b> Nomor resi biasanya diberikan admin setelah barang berangkat.';
+      return;
+    }
+    var text = 'Halo Gagian Cargo, saya mau cek status kiriman dengan nomor resi: ' + resi + '. Mohon info posisi dan perkiraan tibanya. Terima kasih.';
+    var url = 'https://wa.me/6281298242829?text=' + encodeURIComponent(text);
+    trackResult.style.display = 'block';
+    trackResult.innerHTML = '<b>Resi ' + esc(resi) + ' siap dicek.</b>'
+      + 'Status terbaru dicek langsung ke admin &mdash; preview ini tidak menampilkan data pelacakan palsu.'
+      + '<br><a class="btn btn-green" style="margin-top:10px" href="' + url + '" target="_blank" rel="noopener">Tanya Status via WhatsApp</a>';
+  });
+
+
+})();
+</script>
