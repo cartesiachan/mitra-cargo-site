@@ -45,19 +45,6 @@ button{cursor:pointer;font:inherit}
 section{padding:64px 0}
 section.alt{background:#faf7f2}
 
-/* Astro lens toggle: outlines static vs island sections */
-.lens-bar{position:sticky;top:0;z-index:60;background:#111;color:#fff;font-size:13px}
-.lens-bar .wrap{display:flex;gap:12px;align-items:center;justify-content:space-between;padding-top:8px;padding-bottom:8px;flex-wrap:wrap}
-.lens-bar .legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
-.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle}
-.dot-static{background:#16a34a}.dot-island{background:#f97316}
-.lens-toggle{background:var(--brand);color:#fff;border:1px solid var(--brand);border-radius:999px;padding:7px 14px;font-weight:700;font-size:13px}
-.lens-toggle:hover{background:transparent;color:#fff}
-body.lens [data-astro]{outline:3px dashed #16a34a;outline-offset:-3px;position:relative}
-body.lens [data-astro="island"]{outline-color:#f97316}
-body.lens [data-astro]::after{content:attr(data-astro-label);position:absolute;top:8px;right:8px;background:#16a34a;color:#fff;font-size:11px;font-weight:700;letter-spacing:.06em;padding:4px 8px;border-radius:999px;z-index:5}
-body.lens [data-astro="island"]::after{background:#f97316}
-
 /* Scroll reveal (CSS only, progressive enhancement) */
 @keyframes riseIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 @supports (animation-timeline: view()){
@@ -72,7 +59,7 @@ body.lens [data-astro="island"]::after{background:#f97316}
 .topbar{background:#111;color:#fff;font-size:13px}
 .topbar .wrap{display:flex;gap:20px;flex-wrap:wrap;align-items:center;justify-content:space-between;padding-top:8px;padding-bottom:8px}
 .topbar a{color:#fff;text-decoration:none;font-weight:700}
-header.site{position:sticky;top:33px;background:#fff;border-bottom:1px solid #e2e8f0;z-index:50}
+header.site{position:sticky;top:0;background:#fff;border-bottom:1px solid #e2e8f0;z-index:50}
 header.site .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:14px;padding-bottom:14px}
 .logo{display:flex;align-items:center;gap:12px;text-decoration:none}
 .logo-mark{width:44px;height:44px;border-radius:10px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -108,13 +95,6 @@ nav.main a.btn:hover{color:var(--brand)}
 @keyframes dashmove{to{stroke-dashoffset:-24}}
 .port{fill:var(--aksen)}
 .port-hub{fill:#f97316}
-
-/* Astro strip */
-.astro-strip{background:var(--brand);color:#fff;padding:18px 0}
-.astro-strip .wrap{display:flex;gap:24px;flex-wrap:wrap;align-items:center;justify-content:space-between}
-.astro-strip b{font-size:17px}
-.astro-strip span{font-size:14px;opacity:.92}
-.astro-strip .pill{border:1px solid rgba(255,255,255,.5);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:700;white-space:nowrap}
 
 /* Tools */
 .tools{margin-top:-28px;padding-top:0;position:relative;z-index:2}
@@ -230,7 +210,6 @@ footer.site{background:#111;color:#fff;padding:48px 0 0}
   .menu-toggle{display:block}
   header.site .wrap{position:relative}
   header.site{top:0}
-  .lens-bar{position:static}
   section{padding:48px 0}
   .sticky-cta{display:block}
   body{padding-bottom:64px}
@@ -287,14 +266,6 @@ footer.site{background:#111;color:#fff;padding:48px 0 0}
 
 {peng.aktif && peng.teks && (<div class="announce">{peng.teks}</div>)}
 
-<div class="lens-bar">
-  <div class="wrap">
-    <span><b>PREVIEW ASTRO</b> — bukan situs asli, ini remake. Klik tombol untuk melihat peta Astro:</span>
-    <span class="legend"><span><i class="dot dot-static"></i>Static — 0 JS</span><span><i class="dot dot-island"></i>Island — JS hanya di sini</span></span>
-    <button class="lens-toggle" id="lensToggle" type="button" aria-pressed="false">Lihat Peta Astro</button>
-  </div>
-</div>
-
 <div class="topbar">
   <div class="wrap">
     <span>{kontak.jam}</span>
@@ -336,9 +307,8 @@ footer.site{background:#111;color:#fff;padding:48px 0 0}
       </div>
     </div>
     <div class="bottom">
-      <span>© {year} {brand}</span>
-      <span>Foto: Wikimedia Commons — Kapal kontainer di Koper (CC0); tumpukan kontainer Rotterdam, terminal Bremerhaven, Pelabuhan Makassar, kapal Reecon Whale, Kota Jayapura, tongkang DVIDS (domain publik), Pelabuhan Ketapang, motor di feri Sankta Maria (CC BY-SA). Semua foto stok, bukan foto perusahaan.</span>
-      <span>Remake Astro. Konten dari situs asli + preview 6 Nov. Data kontak memakai satu versi konsisten — situs asli berbeda antar halaman, jadi konfirmasi sebelum dipakai live. Statistik angka sengaja tidak ditampilkan (situs asli menampilkan 0).</span>
+      <span>© {year} {brand} · CV Bina Mitra Perkasa</span>
+      <span>Jakarta, Indonesia</span>
     </div>
   </div>
 </footer>
@@ -357,14 +327,6 @@ footer.site{background:#111;color:#fff;padding:48px 0 0}
   });
   nav.querySelectorAll('a').forEach(function(a){
     a.addEventListener('click', function(){ nav.classList.remove('open'); });
-  });
-
-  // Astro lens toggle
-  var lensBtn = document.getElementById('lensToggle');
-  lensBtn.addEventListener('click', function(){
-    var on = document.body.classList.toggle('lens');
-    lensBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
-    lensBtn.textContent = on ? 'Sembunyikan Peta Astro' : 'Lihat Peta Astro';
   });
 })();
 </script>
