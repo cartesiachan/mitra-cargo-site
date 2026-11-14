@@ -8,10 +8,20 @@ const authed = await isAuthed(Astro.request);
 const data = await loadSiteData();
 const { konten, kontak, seo, tarif, source } = data;
 const hero = konten.hero || {};
-const kontenKeys = Object.keys(konten).filter((k) => k !== 'hero').sort();
+const heroOverlay = konten.heroOverlay || { left: 0.82, right: 0.4 };
+const tema = konten.tema || { brand: '#970A0A', aksen: '#FFCD06', navy: '#0f172a', hijau: '#16a34a' };
+const pengumuman = konten.pengumuman || { aktif: false, teks: '' };
+const services = konten.services || { items: [] };
+const faq = konten.faq || { items: [] };
+const testimonials = konten.testimonials || { items: [] };
+// Kunci yang punya editor ramah sendiri — jangan tampilkan sebagai JSON mentah.
+const friendlyKeys = ['hero', 'heroOverlay', 'tema', 'pengumuman', 'services', 'faq', 'testimonials'];
+const kontenKeys = Object.keys(konten).filter((k) => !friendlyKeys.includes(k)).sort();
 const seoHome = seo.home || {};
 const seoHarga = seo.harga || {};
 const esc = (v: any) => (v === undefined || v === null ? '' : String(v));
+const iconOptions = ['tag', 'globe', 'globeSingle', 'shieldCheck', 'shield', 'truck', 'box', 'plane', 'warehouse', 'clock', 'motor', 'refresh'];
+const heroTitleHtml = `${esc(hero.titleBefore || '')}<em>${esc(hero.titleEm || '')}</em>${esc(hero.titleAfter || '')}`;
 ---
 
 <!doctype html>
@@ -34,16 +44,42 @@ const esc = (v: any) => (v === undefined || v === null ? '' : String(v));
   textarea { min-height: 110px; font-family: monospace; font-size: 13px; }
   button { background: #111; color: #fff; border: none; padding: 10px 18px; font-size: 14px; cursor: pointer; margin-top: 12px; }
   button.ghost { background: #fff; color: #111; border: 1px solid #111; }
+  button.danger { background: #a00; }
+  button.small { padding: 5px 10px; font-size: 13px; margin-top: 0; }
   .status { font-size: 13px; margin-top: 8px; min-height: 18px; }
   .status.ok { color: #0a6b1f; font-weight: bold; }
   .status.err { color: #a00; font-weight: bold; }
   .warn { background: #fff3cd; border: 1px solid #d9a400; padding: 12px; margin-bottom: 14px; font-size: 14px; }
+  .warntext { color: #a00; font-weight: bold; font-size: 13px; }
+  .oktext { color: #0a6b1f; font-size: 13px; }
   .badge { display: inline-block; background: #111; color: #fff; font-size: 12px; padding: 2px 8px; }
   table.tarif { width: 100%; border-collapse: collapse; font-size: 13px; }
   table.tarif th, table.tarif td { border: 1px solid #ccc; padding: 4px; }
   table.tarif input, table.tarif select { padding: 4px; font-size: 13px; }
   .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
   .loginbox { max-width: 420px; margin: 80px auto; background: #fff; border: 1px solid #ccc; padding: 24px; }
+  .navrow { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0 4px; }
+  .navrow a { background: #fff; border: 1px solid #111; color: #111; text-decoration: none; font-size: 13px; font-weight: bold; padding: 6px 10px; }
+  .navrow a:hover { background: #111; color: #fff; }
+  input[type=range] { width: 100%; }
+  input[type=color] { width: 64px; height: 40px; padding: 2px; cursor: pointer; }
+  .colorrow { display: flex; gap: 12px; align-items: center; margin: 10px 0; }
+  .colorrow .hex { font-family: monospace; font-weight: bold; }
+  .swatch { width: 40px; height: 40px; border: 1px solid #999; flex-shrink: 0; }
+  .minipreview { border: 1px solid #999; border-radius: 8px; overflow: hidden; margin-top: 10px; }
+  .minipreview .hero-mock { padding: 20px; color: #fff; background-size: cover; background-position: center; }
+  .minipreview .hero-mock .eyebrow-mock { color: #FFCD06; font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+  .minipreview .hero-mock h4 { font-size: 22px; margin: 6px 0; line-height: 1.25; }
+  .minipreview .hero-mock h4 em { font-style: normal; }
+  .minipreview .btn-mock { display: inline-block; border-radius: 999px; padding: 8px 14px; font-weight: 700; font-size: 13px; color: #fff; margin: 4px 6px 0 0; }
+  .announce-mock { text-align: center; padding: 8px 16px; font-size: 14px; font-weight: 700; color: #fff; }
+  .item { border: 1px solid #999; padding: 12px; margin: 10px 0; background: #fafafa; }
+  .item-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .item-head b { font-size: 14px; }
+  .rowbtns { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .rowbtns button { margin-top: 12px; }
+  .previewframe { width: 100%; height: 520px; border: 1px solid #111; background: #fff; }
+  .csvpreview { font-size: 13px; background: #fafafa; border: 1px solid #ccc; padding: 10px; margin-top: 10px; white-space: pre-wrap; max-height: 220px; overflow-y: auto; }
 </style>
 </head>
 <body>
@@ -69,8 +105,54 @@ const esc = (v: any) => (v === undefined || v === null ? '' : String(v));
   {source !== 'd1' && (
     <div class="warn"><b>Perhatian:</b> halaman ini membaca data cadangan JSON karena binding D1 tidak terhubung. Penyimpanan akan gagal sampai binding DB dipasang kembali.</div>
   )}
+  <div class="navrow">
+    <a href="#tampilan">Tampilan</a><a href="#hero">Hero</a><a href="#daftar">Daftar</a><a href="#konten-lain">Konten lain</a><a href="#tarif">Tarif</a><a href="#kontak">Kontak</a><a href="#seo">SEO</a><a href="#preview">Preview</a>
+  </div>
 
-  <h2>Hero (judul utama)</h2>
+  <h2 id="tampilan">Tampilan (overlay, warna, pengumuman)</h2>
+  <div class="card">
+    <h3>Overlay hero</h3>
+    <p class="sub">Geser slider — preview di bawah ikut berubah langsung (belum tersimpan). Tekan Simpan Overlay untuk menerapkan ke situs.</p>
+    <label>Overlay kiri (zona teks): <span id="ov-left-val">{heroOverlay.left}</span></label>
+    <input type="range" id="ov-left" min="0" max="1" step="0.01" value={heroOverlay.left}>
+    <label>Overlay kanan (zona gambar): <span id="ov-right-val">{heroOverlay.right}</span></label>
+    <input type="range" id="ov-right" min="0" max="1" step="0.01" value={heroOverlay.right}>
+    <div class="minipreview">
+      <div class="hero-mock" id="heroMock" style={`background-image:linear-gradient(90deg, rgba(15, 23, 42, ${heroOverlay.left}), rgba(15, 23, 42, ${heroOverlay.right})), url(/images/hero-koper.jpg)`}>
+        <div class="eyebrow-mock">{esc(hero.eyebrow)}</div>
+        <h4><span set:html={heroTitleHtml}></span></h4>
+        <span class="btn-mock" id="btnMock" style={`background:${tema.brand}`}>{esc(hero.btnWa || 'Minta Penawaran')}</span><span class="btn-mock" id="waMock" style={`background:${tema.hijau}`}>Chat WhatsApp</span>
+      </div>
+      <div class="announce-mock" id="announceMock" style={`background:${tema.brand};display:${pengumuman.aktif && pengumuman.teks ? 'block' : 'none'}`}>{esc(pengumuman.teks)}</div>
+    </div>
+    <button type="button" id="saveOverlayBtn">Simpan Overlay</button>
+    <div class="status" id="status-overlay"></div>
+  </div>
+  <div class="card">
+    <h3>Warna tema</h3>
+    <p class="sub">Empat warna identitas situs. Preview di atas ikut berubah saat warna diganti (belum tersimpan). Tekan Simpan Warna untuk menerapkan ke situs.</p>
+    <div class="colorrow"><input type="color" id="tema-brand" value={tema.brand}><span class="swatch" id="sw-brand" style={`background:${tema.brand}`}></span><span><b>Brand</b> (tombol, logo, strip) — <span class="hex" id="hex-brand">{tema.brand}</span></span></div>
+    <div class="colorrow"><input type="color" id="tema-aksen" value={tema.aksen}><span class="swatch" id="sw-aksen" style={`background:${tema.aksen}`}></span><span><b>Aksen</b> (judul miring, angka) — <span class="hex" id="hex-aksen">{tema.aksen}</span></span></div>
+    <div class="colorrow"><input type="color" id="tema-navy" value={tema.navy}><span class="swatch" id="sw-navy" style={`background:${tema.navy}`}></span><span><b>Navy</b> (latar gelap hero) — <span class="hex" id="hex-navy">{tema.navy}</span></span></div>
+    <div class="colorrow"><input type="color" id="tema-hijau" value={tema.hijau}><span class="swatch" id="sw-hijau" style={`background:${tema.hijau}`}></span><span><b>Hijau</b> (WhatsApp) — <span class="hex" id="hex-hijau">{tema.hijau}</span></span></div>
+    <div id="contrastWarn"></div>
+    <div class="rowbtns">
+      <button type="button" id="saveTemaBtn">Simpan Warna</button>
+      <button type="button" class="ghost" id="resetTemaBtn">Reset ke default</button>
+    </div>
+    <div class="status" id="status-tema"></div>
+  </div>
+  <div class="card">
+    <h3>Banner pengumuman</h3>
+    <p class="sub">Bar tipis di paling atas situs. Hanya tampil bila saklar aktif DAN teks terisi. Preview bar-nya ada di kotak preview overlay di atas.</p>
+    <label>Teks pengumuman</label>
+    <input type="text" id="peng-teks" value={esc(pengumuman.teks)} placeholder="cth: Libur Lebaran 20–24 Maret, pengiriman tetap jalan">
+    <label><input type="checkbox" id="peng-aktif" checked={pengumuman.aktif} style="width:auto"> Tampilkan banner</label>
+    <button type="button" id="savePengBtn">Simpan Pengumuman</button>
+    <div class="status" id="status-peng"></div>
+  </div>
+
+  <h2 id="hero">Hero (judul utama)</h2>
   <div class="card">
     <label>Eyebrow</label>
     <input type="text" id="hero-eyebrow" value={esc(hero.eyebrow)}>
@@ -92,8 +174,120 @@ const esc = (v: any) => (v === undefined || v === null ? '' : String(v));
     <div class="status" id="status-hero"></div>
   </div>
 
-  <h2>Konten lain (JSON per bagian)</h2>
-  <p class="sub">Tiap bagian disimpan sebagai satu nilai JSON. Ubah teks di dalam JSON dengan hati-hati: tanda kutip dan koma harus tetap valid.</p>
+  <h2 id="daftar">Daftar (layanan, FAQ, testimoni)</h2>
+  <div class="card" id="sec-services">
+    <h3>Layanan</h3>
+    <label>Eyebrow</label>
+    <input type="text" data-w="eyebrow" value={esc(services.eyebrow)}>
+    <label>Judul</label>
+    <input type="text" data-w="title" value={esc(services.title)}>
+    <label>Subjudul</label>
+    <textarea data-w="sub" style="min-height:60px">{esc(services.sub)}</textarea>
+    <label>Catatan foto</label>
+    <textarea data-w="photoNote" style="min-height:60px">{esc(services.photoNote)}</textarea>
+    <div data-items>
+      {(services.items || []).map((s: any, i: number) => (
+        <div class="item" data-item>
+          <div class="item-head"><b>Layanan {i + 1}</b><button type="button" class="danger small" data-del-item>Hapus</button></div>
+          <label>Judul</label><input type="text" data-f="title" value={esc(s.title)}>
+          <label>Mode (cth: Via Laut)</label><input type="text" data-f="mode" value={esc(s.mode)}>
+          <label>Kota / wilayah</label><input type="text" data-f="cities" value={esc(s.cities)}>
+          <label>Foto (path, cth: /images/port-makassar.jpg)</label><input type="text" data-f="photo" value={esc(s.photo)}>
+          <label>Alt foto</label><input type="text" data-f="photoAlt" value={esc(s.photoAlt)}>
+          <label>Teks WhatsApp</label><input type="text" data-f="waText" value={esc(s.waText)}>
+          <label>Label tombol</label><input type="text" data-f="btnLabel" value={esc(s.btnLabel)}>
+          <label>Ikon</label>
+          <select data-f="icon">{iconOptions.map((o) => (<option selected={s.icon === o}>{o}</option>))}</select>
+          <label>Wilayah WA</label><input type="text" data-f="waRegion" value={esc(s.waRegion)}>
+        </div>
+      ))}
+    </div>
+    <template id="tpl-services">
+      <div class="item" data-item>
+        <div class="item-head"><b>Layanan baru</b><button type="button" class="danger small" data-del-item>Hapus</button></div>
+        <label>Judul</label><input type="text" data-f="title" value="">
+        <label>Mode (cth: Via Laut)</label><input type="text" data-f="mode" value="Via Laut">
+        <label>Kota / wilayah</label><input type="text" data-f="cities" value="">
+        <label>Foto (path, cth: /images/port-makassar.jpg)</label><input type="text" data-f="photo" value="/images/rotterdam-stacks.jpg">
+        <label>Alt foto</label><input type="text" data-f="photoAlt" value="">
+        <label>Teks WhatsApp</label><input type="text" data-f="waText" value="Halo, saya mau tanya tarif ekspedisi.">
+        <label>Label tombol</label><input type="text" data-f="btnLabel" value="Tanya Tarif">
+        <label>Ikon</label>
+        <select data-f="icon">{iconOptions.map((o) => (<option>{o}</option>))}</select>
+        <label>Wilayah WA</label><input type="text" data-f="waRegion" value="Umum">
+      </div>
+    </template>
+    <div class="rowbtns">
+      <button type="button" data-add-item="services">+ Tambah layanan</button>
+      <button type="button" data-save-list="services">Simpan Layanan</button>
+    </div>
+    <div class="status" id="status-services"></div>
+  </div>
+  <div class="card" id="sec-faq">
+    <h3>FAQ</h3>
+    <label>Eyebrow</label>
+    <input type="text" data-w="eyebrow" value={esc(faq.eyebrow)}>
+    <label>Judul</label>
+    <input type="text" data-w="title" value={esc(faq.title)}>
+    <div data-items>
+      {(faq.items || []).map((f: any, i: number) => (
+        <div class="item" data-item>
+          <div class="item-head"><b>FAQ {i + 1}</b><button type="button" class="danger small" data-del-item>Hapus</button></div>
+          <label>Pertanyaan</label><input type="text" data-f="q" value={esc(f.q)}>
+          <label>Jawaban</label><textarea data-f="a" style="min-height:70px">{esc(f.a)}</textarea>
+        </div>
+      ))}
+    </div>
+    <template id="tpl-faq">
+      <div class="item" data-item>
+        <div class="item-head"><b>FAQ baru</b><button type="button" class="danger small" data-del-item>Hapus</button></div>
+        <label>Pertanyaan</label><input type="text" data-f="q" value="">
+        <label>Jawaban</label><textarea data-f="a" style="min-height:70px"></textarea>
+      </div>
+    </template>
+    <div class="rowbtns">
+      <button type="button" data-add-item="faq">+ Tambah FAQ</button>
+      <button type="button" data-save-list="faq">Simpan FAQ</button>
+    </div>
+    <div class="status" id="status-faq"></div>
+  </div>
+  <div class="card" id="sec-testimonials">
+    <h3>Testimoni</h3>
+    <label>Eyebrow</label>
+    <input type="text" data-w="eyebrow" value={esc(testimonials.eyebrow)}>
+    <label>Judul</label>
+    <input type="text" data-w="title" value={esc(testimonials.title)}>
+    <label>Intro</label>
+    <textarea data-w="intro" style="min-height:60px">{esc(testimonials.intro)}</textarea>
+    <div data-items>
+      {(testimonials.items || []).map((t: any, i: number) => (
+        <div class="item" data-item>
+          <div class="item-head"><b>Testimoni {i + 1}</b><button type="button" class="danger small" data-del-item>Hapus</button></div>
+          <label>Nama</label><input type="text" data-f="name" value={esc(t.name)}>
+          <label>Inisial</label><input type="text" data-f="initials" value={esc(t.initials)}>
+          <label>Kutipan</label><textarea data-f="quote" style="min-height:70px">{esc(t.quote)}</textarea>
+          <label>Rute (cth: Jakarta → Jayapura, Papua)</label><input type="text" data-f="route" value={esc(t.route)}>
+        </div>
+      ))}
+    </div>
+    <template id="tpl-testimonials">
+      <div class="item" data-item>
+        <div class="item-head"><b>Testimoni baru</b><button type="button" class="danger small" data-del-item>Hapus</button></div>
+        <label>Nama</label><input type="text" data-f="name" value="">
+        <label>Inisial</label><input type="text" data-f="initials" value="">
+        <label>Kutipan</label><textarea data-f="quote" style="min-height:70px"></textarea>
+        <label>Rute (cth: Jakarta → Jayapura, Papua)</label><input type="text" data-f="route" value="">
+      </div>
+    </template>
+    <div class="rowbtns">
+      <button type="button" data-add-item="testimonials">+ Tambah testimoni</button>
+      <button type="button" data-save-list="testimonials">Simpan Testimoni</button>
+    </div>
+    <div class="status" id="status-testimonials"></div>
+  </div>
+
+  <h2 id="konten-lain">Konten lain (JSON per bagian)</h2>
+  <p class="sub">Tiap bagian disimpan sebagai satu nilai JSON. Ubah teks di dalam JSON dengan hati-hati: tanda kutip dan koma harus tetap valid. Layanan, FAQ, dan testimoni sudah punya editor sendiri di atas.</p>
   {kontenKeys.map((key) => (
     <div class="card">
       <h3>{key}</h3>
@@ -103,12 +297,12 @@ const esc = (v: any) => (v === undefined || v === null ? '' : String(v));
     </div>
   ))}
 
-  <h2>Tarif (71 baris)</h2>
+  <h2 id="tarif">Tarif ({tarif.length} baris)</h2>
   <div class="card">
-    <p class="sub">Ubah harga / kota / layanan di tabel, lalu tekan Simpan Tarif. Seluruh tabel disimpan sekaligus.</p>
+    <p class="sub">Ubah harga / kota / layanan di tabel, lalu tekan Simpan Tarif. Seluruh tabel disimpan sekaligus. Tombol × menghapus baris (baru tersimpan setelah Simpan Tarif ditekan).</p>
     <div style="overflow-x:auto">
     <table class="tarif">
-      <tr><th>Kota</th><th>Region</th><th>Layanan</th><th>Min (kg)</th><th>Harga/kg (Rp)</th><th>ETA</th><th>Catatan</th></tr>
+      <tr><th>Kota</th><th>Region</th><th>Layanan</th><th>Min (kg)</th><th>Harga/kg (Rp)</th><th>ETA</th><th>Catatan</th><th></th></tr>
       {tarif.map((r: any, i: number) => (
         <tr data-row={i}>
           <td><input type="text" data-f="c" value={esc(r.c)}></td>
@@ -126,15 +320,28 @@ const esc = (v: any) => (v === undefined || v === null ? '' : String(v));
           <td><input type="number" data-f="price" value={esc(r.price)} min="0" step="1"></td>
           <td><input type="text" data-f="eta" value={esc(r.eta)}></td>
           <td><input type="text" data-f="note" value={esc(r.note)}></td>
+          <td><button type="button" class="danger small" data-del-row>×</button></td>
         </tr>
       ))}
     </table>
     </div>
-    <button type="button" id="saveTarifBtn">Simpan Tarif</button>
+    <div class="rowbtns">
+      <button type="button" id="addTarifBtn">+ Tambah baris tarif</button>
+      <button type="button" id="saveTarifBtn">Simpan Tarif</button>
+      <button type="button" class="ghost" id="exportCsvBtn">Unduh CSV</button>
+    </div>
     <div class="status" id="status-tarif"></div>
+    <h3>Import CSV</h3>
+    <p class="sub">Pilih file CSV (hasil export di atas, atau editan spreadsheet). Kolom wajib: Kota, Region, Layanan, Min (kg), Harga/kg (Rp), ETA, Catatan. Baris dicek dulu — tabel baru diganti setelah pratinjau disetujui, dan tetap butuh Simpan Tarif.</p>
+    <input type="file" id="csvFile" accept=".csv,text/csv">
+    <div class="csvpreview" id="csvPreview" style="display:none"></div>
+    <div class="rowbtns">
+      <button type="button" id="applyCsvBtn" style="display:none">Terapkan ke tabel</button>
+    </div>
+    <div class="status" id="status-csv"></div>
   </div>
 
-  <h2>Kontak</h2>
+  <h2 id="kontak">Kontak</h2>
   <div class="card">
     <label>Call center</label>
     <input type="text" id="kontak-call_center" value={esc(kontak.call_center)}>
@@ -164,7 +371,7 @@ const esc = (v: any) => (v === undefined || v === null ? '' : String(v));
     <div class="status" id="status-kontak-marketing_wilayah"></div>
   </div>
 
-  <h2>SEO</h2>
+  <h2 id="seo">SEO</h2>
   <div class="card">
     <label>Kode verifikasi Google Search Console</label>
     <input type="text" id="seo-gscVerification" value={esc(seo.gscVerification)}>
@@ -198,6 +405,18 @@ const esc = (v: any) => (v === undefined || v === null ? '' : String(v));
     <input type="text" id="seo-harga-ogImage" value={esc(seoHarga.ogImage)}>
     <button type="button" id="saveSeoHargaBtn">Simpan SEO Daftar Harga</button>
     <div class="status" id="status-seo-harga"></div>
+  </div>
+
+  <h2 id="preview">Preview halaman</h2>
+  <div class="card">
+    <p class="sub">Menampilkan situs live yang TERSIMPAN (bukan draft). Kalau baru mengubah sesuatu, tekan Simpan dulu, lalu tekan Muat ulang di sini.</p>
+    <div class="rowbtns">
+      <button type="button" id="pvHomeBtn">Beranda</button>
+      <button type="button" id="pvHargaBtn">Daftar Harga</button>
+      <button type="button" class="ghost" id="pvReloadBtn">Muat ulang</button>
+      <a href="/" target="_blank" rel="noopener" style="margin-top:12px;font-weight:bold">Buka di tab baru ↗</a>
+    </div>
+    <iframe class="previewframe" id="pvFrame" src="/" title="Preview situs live"></iframe>
   </div>
   </>
 )}
@@ -282,31 +501,356 @@ const esc = (v: any) => (v === undefined || v === null ? '' : String(v));
       }, 'status-hero');
     });
   }
+
+  /* ---------- Tampilan: overlay, warna, pengumuman (Fitur 1, 3, 5) ---------- */
+  var TEMA_DEFAULT = { brand: '#970A0A', aksen: '#FFCD06', navy: '#0f172a', hijau: '#16a34a' };
+  function hexRgb(hex) {
+    var h = (hex || '').replace('#', '');
+    if (h.length === 3) h = h.split('').map(function (c) { return c + c; }).join('');
+    var n = parseInt(h, 16);
+    if (isNaN(n)) return '15, 23, 42';
+    return ((n >> 16) & 255) + ', ' + ((n >> 8) & 255) + ', ' + (n & 255);
+  }
+  function luminance(hex) {
+    var rgb = hexRgb(hex).split(',').map(function (x) { return parseInt(x, 10) / 255; });
+    var f = function (c) { return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+    return 0.2126 * f(rgb[0]) + 0.7152 * f(rgb[1]) + 0.0722 * f(rgb[2]);
+  }
+  function contrastRatio(hexA, hexB) {
+    var la = luminance(hexA), lb = luminance(hexB);
+    var hi = Math.max(la, lb), lo = Math.min(la, lb);
+    return (hi + 0.05) / (lo + 0.05);
+  }
+  function temaVals() {
+    return {
+      brand: el('tema-brand').value,
+      aksen: el('tema-aksen').value,
+      navy: el('tema-navy').value,
+      hijau: el('tema-hijau').value,
+    };
+  }
+  function updateHeroMock() {
+    var mock = el('heroMock');
+    if (!mock) return;
+    var left = parseFloat(el('ov-left').value);
+    var right = parseFloat(el('ov-right').value);
+    var t = temaVals();
+    var rgb = hexRgb(t.navy);
+    el('ov-left-val').textContent = left.toFixed(2);
+    el('ov-right-val').textContent = right.toFixed(2);
+    mock.style.backgroundImage = 'linear-gradient(90deg, rgba(' + rgb + ', ' + left + '), rgba(' + rgb + ', ' + right + ')), url(/images/hero-koper.jpg)';
+    var em = mock.querySelector('h4 em');
+    if (em) em.style.color = t.aksen;
+    var eb = mock.querySelector('.eyebrow-mock');
+    if (eb) eb.style.color = t.aksen;
+    el('btnMock').style.background = t.brand;
+    el('waMock').style.background = t.hijau;
+    el('sw-brand').style.background = t.brand;
+    el('sw-aksen').style.background = t.aksen;
+    el('sw-navy').style.background = t.navy;
+    el('sw-hijau').style.background = t.hijau;
+    el('hex-brand').textContent = t.brand;
+    el('hex-aksen').textContent = t.aksen;
+    el('hex-navy').textContent = t.navy;
+    el('hex-hijau').textContent = t.hijau;
+    var am = el('announceMock');
+    am.style.background = t.brand;
+    var showAnn = el('peng-aktif').checked && el('peng-teks').value.trim() !== '';
+    am.style.display = showAnn ? 'block' : 'none';
+    am.textContent = el('peng-teks').value;
+    // Peringatan kontras: teks putih di atas brand, aksen di atas navy.
+    var rBrand = contrastRatio(t.brand, '#ffffff');
+    var rAksen = contrastRatio(t.aksen, t.navy);
+    var warns = [];
+    if (rBrand < 3) warns.push('Brand vs teks putih: kontras ' + rBrand.toFixed(1) + ':1 — terlalu rendah, tombol/teks putih sulit dibaca.');
+    if (rAksen < 3) warns.push('Aksen vs navy: kontras ' + rAksen.toFixed(1) + ':1 — terlalu rendah, judul miring sulit dibaca.');
+    var w = el('contrastWarn');
+    if (warns.length) {
+      w.innerHTML = '<span class="warntext">Peringatan: ' + warns.join(' ') + '</span>';
+    } else {
+      w.innerHTML = '<span class="oktext">Kontras aman (brand vs putih ' + rBrand.toFixed(1) + ':1, aksen vs navy ' + rAksen.toFixed(1) + ':1).</span>';
+    }
+  }
+  ['ov-left', 'ov-right', 'tema-brand', 'tema-aksen', 'tema-navy', 'tema-hijau', 'peng-teks', 'peng-aktif'].forEach(function (id) {
+    var n = el(id);
+    if (n) n.addEventListener('input', updateHeroMock);
+  });
+  var saveOverlayBtn = el('saveOverlayBtn');
+  if (saveOverlayBtn) {
+    saveOverlayBtn.addEventListener('click', function () {
+      saveKV('konten', 'heroOverlay', {
+        left: parseFloat(el('ov-left').value),
+        right: parseFloat(el('ov-right').value),
+      }, 'status-overlay');
+    });
+  }
+  var saveTemaBtn = el('saveTemaBtn');
+  if (saveTemaBtn) {
+    saveTemaBtn.addEventListener('click', function () {
+      saveKV('konten', 'tema', temaVals(), 'status-tema');
+    });
+  }
+  var resetTemaBtn = el('resetTemaBtn');
+  if (resetTemaBtn) {
+    resetTemaBtn.addEventListener('click', function () {
+      el('tema-brand').value = TEMA_DEFAULT.brand;
+      el('tema-aksen').value = TEMA_DEFAULT.aksen;
+      el('tema-navy').value = TEMA_DEFAULT.navy;
+      el('tema-hijau').value = TEMA_DEFAULT.hijau;
+      updateHeroMock();
+      setStatus('status-tema', 'Dikembalikan ke default di form (belum tersimpan — tekan Simpan Warna).', true);
+    });
+  }
+  var savePengBtn = el('savePengBtn');
+  if (savePengBtn) {
+    savePengBtn.addEventListener('click', function () {
+      saveKV('konten', 'pengumuman', {
+        aktif: el('peng-aktif').checked,
+        teks: el('peng-teks').value,
+      }, 'status-peng');
+    });
+  }
+  updateHeroMock();
+
+  /* ---------- Editor daftar: layanan / FAQ / testimoni (Fitur 4) ---------- */
+  document.addEventListener('click', function (ev) {
+    var del = ev.target.closest('[data-del-item]');
+    if (del) {
+      var item = del.closest('[data-item]');
+      if (item) item.remove();
+      return;
+    }
+    var delRow = ev.target.closest('[data-del-row]');
+    if (delRow) {
+      var tr = delRow.closest('tr[data-row]');
+      if (tr) tr.remove();
+    }
+  });
+  document.querySelectorAll('[data-add-item]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-add-item');
+      var tpl = el('tpl-' + key);
+      var sec = el('sec-' + key);
+      if (!tpl || !sec) return;
+      var box = sec.querySelector('[data-items]');
+      var node = tpl.content.firstElementChild.cloneNode(true);
+      box.appendChild(node);
+      node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  });
+  document.querySelectorAll('[data-save-list]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-save-list');
+      var sec = el('sec-' + key);
+      var statusId = 'status-' + key;
+      var value = {};
+      sec.querySelectorAll('[data-w]').forEach(function (n) {
+        value[n.getAttribute('data-w')] = n.value;
+      });
+      var items = [];
+      var err = '';
+      sec.querySelectorAll('[data-items] [data-item]').forEach(function (card, idx) {
+        var obj = {};
+        card.querySelectorAll('[data-f]').forEach(function (n) {
+          obj[n.getAttribute('data-f')] = n.value;
+        });
+        if (key === 'services' && !obj.title.trim()) err = 'Layanan ke-' + (idx + 1) + ' belum punya judul.';
+        if (key === 'faq' && !obj.q.trim()) err = 'FAQ ke-' + (idx + 1) + ' belum punya pertanyaan.';
+        if (key === 'testimonials' && (!obj.name.trim() || !obj.quote.trim())) err = 'Testimoni ke-' + (idx + 1) + ' belum punya nama/kutipan.';
+        items.push(obj);
+      });
+      if (err) { setStatus(statusId, 'Gagal: ' + err, false); return; }
+      value.items = items;
+      saveKV('konten', key, value, statusId);
+    });
+  });
+
+  /* ---------- Tarif: tambah/hapus baris + CSV (Fitur 4, 8) ---------- */
+  function collectTarifRows() {
+    var rows = [];
+    document.querySelectorAll('tr[data-row]').forEach(function (tr) {
+      var g = function (f) { var n = tr.querySelector('[data-f="' + f + '"]'); return n ? n.value : ''; };
+      rows.push({
+        c: g('c'),
+        r: g('r'),
+        s: g('s'),
+        min: parseInt(g('min'), 10),
+        price: parseInt(g('price'), 10),
+        eta: g('eta'),
+        note: g('note'),
+      });
+    });
+    return rows;
+  }
+  var addTarifBtn = el('addTarifBtn');
+  if (addTarifBtn) {
+    addTarifBtn.addEventListener('click', function () {
+      var table = document.querySelector('table.tarif');
+      var idx = document.querySelectorAll('tr[data-row]').length;
+      var tr = document.createElement('tr');
+      tr.setAttribute('data-row', String(idx));
+      tr.innerHTML = '<td><input type="text" data-f="c" value=""></td>' +
+        '<td><select data-f="r"><option selected>Sulawesi</option><option>Maluku</option><option>Papua</option></select></td>' +
+        '<td><select data-f="s"><option>PELNI</option><option>RORO</option><option selected>Reguler</option></select></td>' +
+        '<td><input type="number" data-f="min" value="50" min="0" step="1"></td>' +
+        '<td><input type="number" data-f="price" value="0" min="0" step="1"></td>' +
+        '<td><input type="text" data-f="eta" value=""></td>' +
+        '<td><input type="text" data-f="note" value=""></td>' +
+        '<td><button type="button" class="danger small" data-del-row>×</button></td>';
+      table.appendChild(tr);
+      tr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      var first = tr.querySelector('[data-f="c"]');
+      if (first) first.focus();
+    });
+  }
   var saveTarifBtn = el('saveTarifBtn');
   if (saveTarifBtn) {
     saveTarifBtn.addEventListener('click', async function () {
       setStatus('status-tarif', 'Menyimpan...', true);
       try {
-        var rows = [];
-        document.querySelectorAll('tr[data-row]').forEach(function (tr) {
-          var g = function (f) { var n = tr.querySelector('[data-f="' + f + '"]'); return n ? n.value : ''; };
-          rows.push({
-            c: g('c'),
-            r: g('r'),
-            s: g('s'),
-            min: parseInt(g('min'), 10),
-            price: parseInt(g('price'), 10),
-            eta: g('eta'),
-            note: g('note'),
-          });
-        });
-        var res = await postJSON('/api/admin/save', { table: 'tarif', rows: rows });
+        var res = await postJSON('/api/admin/save', { table: 'tarif', rows: collectTarifRows() });
         setStatus('status-tarif', 'Tersimpan: ' + res.rows + ' baris. Sudah tampil di situs.', true);
       } catch (e) {
         setStatus('status-tarif', 'Gagal: ' + e.message, false);
       }
     });
   }
+  function csvEscape(v) {
+    var s = String(v === undefined || v === null ? '' : v);
+    if (/[",\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+  var exportCsvBtn = el('exportCsvBtn');
+  if (exportCsvBtn) {
+    exportCsvBtn.addEventListener('click', function () {
+      var rows = collectTarifRows();
+      var lines = ['Kota,Region,Layanan,Min (kg),Harga/kg (Rp),ETA,Catatan'];
+      rows.forEach(function (r) {
+        lines.push([r.c, r.r, r.s, r.min, r.price, r.eta, r.note].map(csvEscape).join(','));
+      });
+      var blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'tarif-gagian-cargo.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setStatus('status-tarif', 'CSV diunduh: ' + rows.length + ' baris.', true);
+    });
+  }
+  function parseCSV(text) {
+    var out = [], row = [], cur = '', inQ = false;
+    for (var i = 0; i < text.length; i++) {
+      var ch = text[i];
+      if (inQ) {
+        if (ch === '"') {
+          if (text[i + 1] === '"') { cur += '"'; i++; }
+          else { inQ = false; }
+        } else { cur += ch; }
+      } else if (ch === '"') {
+        inQ = true;
+      } else if (ch === ',') {
+        row.push(cur); cur = '';
+      } else if (ch === '\n' || ch === '\r') {
+        if (ch === '\r' && text[i + 1] === '\n') i++;
+        row.push(cur); cur = '';
+        if (row.length > 1 || row[0] !== '') out.push(row);
+        row = [];
+      } else { cur += ch; }
+    }
+    if (cur !== '' || row.length) { row.push(cur); out.push(row); }
+    return out.filter(function (r) { return !(r.length === 1 && r[0].trim() === ''); });
+  }
+  var REGIONS = ['Sulawesi', 'Maluku', 'Papua'];
+  var SERVICES = ['PELNI', 'RORO', 'Reguler'];
+  var pendingCsvRows = null;
+  var csvFile = el('csvFile');
+  if (csvFile) {
+    csvFile.addEventListener('change', function () {
+      var file = csvFile.files && csvFile.files[0];
+      var prev = el('csvPreview');
+      var applyBtn = el('applyCsvBtn');
+      pendingCsvRows = null;
+      applyBtn.style.display = 'none';
+      prev.style.display = 'none';
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        try {
+          var grid = parseCSV(String(reader.result || ''));
+          if (grid.length < 2) { setStatus('status-csv', 'Gagal: file kosong atau hanya berisi header.', false); return; }
+          var head = grid[0].map(function (h) { return h.trim().toLowerCase(); });
+          var idx = {};
+          var want = { kota: 'c', region: 'r', layanan: 's', min: 'min', harga: 'price', eta: 'eta', catatan: 'note' };
+          Object.keys(want).forEach(function (k) {
+            for (var j = 0; j < head.length; j++) {
+              if (head[j].indexOf(k) === 0) { idx[want[k]] = j; break; }
+            }
+          });
+          var missing = Object.keys(want).filter(function (k) { return idx[want[k]] === undefined; });
+          if (missing.length) { setStatus('status-csv', 'Gagal: kolom tidak dikenal — hilang: ' + missing.join(', ') + '. Header harus: Kota, Region, Layanan, Min (kg), Harga/kg (Rp), ETA, Catatan.', false); return; }
+          var valid = [], errs = [];
+          for (var i = 1; i < grid.length; i++) {
+            var g = grid[i];
+            var get = function (f) { var v = g[idx[f]]; return v === undefined ? '' : String(v).trim(); };
+            var line = i + 1;
+            var c = get('c'), r = get('r'), s = get('s');
+            var min = parseInt(get('min'), 10), price = parseInt(get('price'), 10);
+            if (!c) { errs.push('Baris ' + line + ': kota kosong.'); continue; }
+            if (REGIONS.indexOf(r) < 0) { errs.push('Baris ' + line + ' (' + c + '): region "' + r + '" tidak valid.'); continue; }
+            if (SERVICES.indexOf(s) < 0) { errs.push('Baris ' + line + ' (' + c + '): layanan "' + s + '" tidak valid.'); continue; }
+            if (!Number.isInteger(min) || min < 0 || !Number.isInteger(price) || price < 0) { errs.push('Baris ' + line + ' (' + c + '): min/harga harus bilangan bulat >= 0.'); continue; }
+            valid.push({ c: c, r: r, s: s, min: min, price: price, eta: get('eta'), note: get('note') });
+          }
+          pendingCsvRows = valid;
+          var msg = 'Pratinjau: ' + valid.length + ' baris valid, ' + errs.length + ' baris bermasalah.\n';
+          if (errs.length) msg += errs.slice(0, 10).join('\n') + (errs.length > 10 ? '\n...dan ' + (errs.length - 10) + ' lagi.' : '');
+          else msg += 'Tidak ada baris bermasalah. Tekan "Terapkan ke tabel", lalu Simpan Tarif.';
+          prev.textContent = msg;
+          prev.style.display = 'block';
+          if (errs.length === 0 && valid.length > 0) {
+            applyBtn.style.display = 'inline-block';
+            setStatus('status-csv', 'Siap diterapkan: ' + valid.length + ' baris.', true);
+          } else {
+            setStatus('status-csv', errs.length ? 'Import ditahan: perbaiki ' + errs.length + ' baris bermasalah dulu (lihat pratinjau).' : 'Gagal: tidak ada baris valid.', false);
+          }
+        } catch (e) {
+          setStatus('status-csv', 'Gagal membaca CSV: ' + e.message, false);
+        }
+      };
+      reader.readAsText(file, 'utf-8');
+    });
+  }
+  var applyCsvBtn = el('applyCsvBtn');
+  if (applyCsvBtn) {
+    applyCsvBtn.addEventListener('click', function () {
+      if (!pendingCsvRows || !pendingCsvRows.length) return;
+      var table = document.querySelector('table.tarif');
+      document.querySelectorAll('tr[data-row]').forEach(function (tr) { tr.remove(); });
+      pendingCsvRows.forEach(function (r, i) {
+        var tr = document.createElement('tr');
+        tr.setAttribute('data-row', String(i));
+        var escA = function (v) { return String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); };
+        var optR = REGIONS.map(function (x) { return '<option' + (x === r.r ? ' selected' : '') + '>' + x + '</option>'; }).join('');
+        var optS = SERVICES.map(function (x) { return '<option' + (x === r.s ? ' selected' : '') + '>' + x + '</option>'; }).join('');
+        tr.innerHTML = '<td><input type="text" data-f="c" value="' + escA(r.c) + '"></td>' +
+          '<td><select data-f="r">' + optR + '</select></td>' +
+          '<td><select data-f="s">' + optS + '</select></td>' +
+          '<td><input type="number" data-f="min" value="' + r.min + '" min="0" step="1"></td>' +
+          '<td><input type="number" data-f="price" value="' + r.price + '" min="0" step="1"></td>' +
+          '<td><input type="text" data-f="eta" value="' + escA(r.eta) + '"></td>' +
+          '<td><input type="text" data-f="note" value="' + escA(r.note) + '"></td>' +
+          '<td><button type="button" class="danger small" data-del-row>×</button></td>';
+        table.appendChild(tr);
+      });
+      el('csvPreview').style.display = 'none';
+      applyCsvBtn.style.display = 'none';
+      setStatus('status-tarif', 'Tabel diganti dari CSV: ' + pendingCsvRows.length + ' baris (belum tersimpan — tekan Simpan Tarif).', true);
+      pendingCsvRows = null;
+    });
+  }
+
+  /* ---------- Kontak & SEO (tidak berubah) ---------- */
   var saveKontakBtn = el('saveKontakBtn');
   if (saveKontakBtn) {
     saveKontakBtn.addEventListener('click', async function () {
@@ -349,6 +893,18 @@ const esc = (v: any) => (v === undefined || v === null ? '' : String(v));
   if (saveSeoHomeBtn) saveSeoHomeBtn.addEventListener('click', function () { saveSeoPage('home', 'status-seo-home'); });
   var saveSeoHargaBtn = el('saveSeoHargaBtn');
   if (saveSeoHargaBtn) saveSeoHargaBtn.addEventListener('click', function () { saveSeoPage('harga', 'status-seo-harga'); });
+
+  /* ---------- Preview halaman (Fitur 2) ---------- */
+  var pvFrame = el('pvFrame');
+  var pvHomeBtn = el('pvHomeBtn');
+  if (pvHomeBtn) pvHomeBtn.addEventListener('click', function () { pvFrame.src = '/'; });
+  var pvHargaBtn = el('pvHargaBtn');
+  if (pvHargaBtn) pvHargaBtn.addEventListener('click', function () { pvFrame.src = '/daftar-harga/'; });
+  var pvReloadBtn = el('pvReloadBtn');
+  if (pvReloadBtn) pvReloadBtn.addEventListener('click', function () {
+    try { pvFrame.contentWindow.location.reload(); }
+    catch (e) { pvFrame.src = pvFrame.src; }
+  });
 })();
 </script>
 </body>
