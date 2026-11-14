@@ -2,14 +2,18 @@
 import Base from '../layouts/Base.astro';
 import CekOngkir from '../components/CekOngkir.astro';
 import Icon from '../components/Icon.astro';
-import konten from '../data/konten.json';
-import kontak from '../data/kontak.json';
+import { loadSiteData } from '../lib/db';
+const data = await loadSiteData();
+Astro.response.headers.set('X-Data-Source', data.source);
+const { konten, kontak } = data;
 const brand = konten.brand;
 const waNum = (region: string) => kontak.marketing_wilayah.find((m) => m.region === region)?.nomor_intl ?? kontak.whatsapp_umum_intl;
 const waHero = `https://wa.me/${kontak.whatsapp_umum_intl}?text=${encodeURIComponent(`Halo ${brand}, ${konten.wa.penawaranHero}`)}`;
 const waKonsultasi = `https://wa.me/${kontak.whatsapp_umum_intl}?text=${encodeURIComponent(`Halo ${brand}, ${konten.wa.konsultasi}`)}`;
+const marketing: Record<string, string> = {};
+kontak.marketing_wilayah.forEach((m) => { marketing[m.region] = m.nomor_intl; });
 ---
-<Base seoKey="home">
+<Base seoKey="home" data={data}>
 <main id="beranda">
 <section class="hero" data-astro="static" data-astro-label="STATIC · 0 JS" style="padding-top:56px">
   <div class="wrap hero-grid">
@@ -50,7 +54,7 @@ const waKonsultasi = `https://wa.me/${kontak.whatsapp_umum_intl}?text=${encodeUR
     </figure>
   </div>
 
-      <CekOngkir />
+      <CekOngkir brand={brand} waUmum={kontak.whatsapp_umum_intl} marketing={marketing} />
 </section>
 <!-- ASTRO STRIP -->
 <div class="astro-strip" data-astro="static" data-astro-label="STATIC · 0 JS">

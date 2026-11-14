@@ -1,0 +1,355 @@
+---
+import { loadSiteData } from '../lib/db';
+import { isAuthed } from '../lib/admin';
+
+export const prerender = false;
+
+const authed = await isAuthed(Astro.request);
+const data = await loadSiteData();
+const { konten, kontak, seo, tarif, source } = data;
+const hero = konten.hero || {};
+const kontenKeys = Object.keys(konten).filter((k) => k !== 'hero').sort();
+const seoHome = seo.home || {};
+const seoHarga = seo.harga || {};
+const esc = (v: any) => (v === undefined || v === null ? '' : String(v));
+---
+
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Admin D1 — Gagian Cargo</title>
+<style>
+  body { font-family: Arial, Helvetica, sans-serif; margin: 0; background: #f4f4f4; color: #111; line-height: 1.5; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 20px; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  h2 { font-size: 19px; border-left: 6px solid #111; padding-left: 10px; margin: 32px 0 10px; }
+  h3 { font-size: 15px; margin: 18px 0 6px; }
+  .sub { color: #555; font-size: 14px; margin-bottom: 16px; }
+  .card { background: #fff; border: 1px solid #ccc; padding: 16px; margin-bottom: 14px; }
+  label { display: block; font-size: 13px; font-weight: bold; margin: 10px 0 3px; }
+  input[type=text], input[type=password], input[type=number], textarea, select { width: 100%; box-sizing: border-box; padding: 8px; font-size: 14px; border: 1px solid #999; font-family: inherit; }
+  textarea { min-height: 110px; font-family: monospace; font-size: 13px; }
+  button { background: #111; color: #fff; border: none; padding: 10px 18px; font-size: 14px; cursor: pointer; margin-top: 12px; }
+  button.ghost { background: #fff; color: #111; border: 1px solid #111; }
+  .status { font-size: 13px; margin-top: 8px; min-height: 18px; }
+  .status.ok { color: #0a6b1f; font-weight: bold; }
+  .status.err { color: #a00; font-weight: bold; }
+  .warn { background: #fff3cd; border: 1px solid #d9a400; padding: 12px; margin-bottom: 14px; font-size: 14px; }
+  .badge { display: inline-block; background: #111; color: #fff; font-size: 12px; padding: 2px 8px; }
+  table.tarif { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.tarif th, table.tarif td { border: 1px solid #ccc; padding: 4px; }
+  table.tarif input, table.tarif select { padding: 4px; font-size: 13px; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .loginbox { max-width: 420px; margin: 80px auto; background: #fff; border: 1px solid #ccc; padding: 24px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+{!authed ? (
+  <div class="loginbox">
+    <h1>Admin D1 — Gagian Cargo</h1>
+    <p class="sub">Masukkan password admin untuk mengedit konten situs. Perubahan tersimpan langsung ke database dan tampil seketika di situs, tanpa rebuild.</p>
+    <label for="pw">Password</label>
+    <input type="password" id="pw" autocomplete="current-password">
+    <button id="loginBtn" type="button">Masuk</button>
+    <div class="status" id="loginStatus"></div>
+  </div>
+) : (
+  <>
+  <div class="topbar">
+    <div>
+      <h1>Admin D1 — Gagian Cargo</h1>
+      <p class="sub">Sumber data: <span class="badge">{source === 'd1' ? 'D1 (live)' : 'JSON cadangan — D1 tidak terhubung!'}</span> &nbsp; Simpan menulis langsung ke D1, tampil seketika di situs.</p>
+    </div>
+    <button class="ghost" id="logoutBtn" type="button">Keluar</button>
+  </div>
+  {source !== 'd1' && (
+    <div class="warn"><b>Perhatian:</b> halaman ini membaca data cadangan JSON karena binding D1 tidak terhubung. Penyimpanan akan gagal sampai binding DB dipasang kembali.</div>
+  )}
+
+  <h2>Hero (judul utama)</h2>
+  <div class="card">
+    <label>Eyebrow</label>
+    <input type="text" id="hero-eyebrow" value={esc(hero.eyebrow)}>
+    <label>Judul awal</label>
+    <input type="text" id="hero-titleBefore" value={esc(hero.titleBefore)}>
+    <label>Judul tengah (miring)</label>
+    <input type="text" id="hero-titleEm" value={esc(hero.titleEm)}>
+    <label>Judul akhir</label>
+    <input type="text" id="hero-titleAfter" value={esc(hero.titleAfter)}>
+    <label>Lead (paragraf pembuka)</label>
+    <textarea id="hero-lead">{esc(hero.lead)}</textarea>
+    <label>Tombol WhatsApp</label>
+    <input type="text" id="hero-btnWa" value={esc(hero.btnWa)}>
+    <label>Tombol Lihat Layanan</label>
+    <input type="text" id="hero-btnLayanan" value={esc(hero.btnLayanan)}>
+    <label>Chips (satu per baris)</label>
+    <textarea id="hero-chips">{(hero.chips || []).join('\n')}</textarea>
+    <button type="button" data-save-hero>Simpan Hero</button>
+    <div class="status" id="status-hero"></div>
+  </div>
+
+  <h2>Konten lain (JSON per bagian)</h2>
+  <p class="sub">Tiap bagian disimpan sebagai satu nilai JSON. Ubah teks di dalam JSON dengan hati-hati: tanda kutip dan koma harus tetap valid.</p>
+  {kontenKeys.map((key) => (
+    <div class="card">
+      <h3>{key}</h3>
+      <textarea id={'konten-' + key}>{JSON.stringify(konten[key], null, 2)}</textarea>
+      <button type="button" data-save-json data-table="konten" data-key={key} data-el={'konten-' + key} data-status={'status-konten-' + key}>Simpan {key}</button>
+      <div class="status" id={'status-konten-' + key}></div>
+    </div>
+  ))}
+
+  <h2>Tarif (71 baris)</h2>
+  <div class="card">
+    <p class="sub">Ubah harga / kota / layanan di tabel, lalu tekan Simpan Tarif. Seluruh tabel disimpan sekaligus.</p>
+    <div style="overflow-x:auto">
+    <table class="tarif">
+      <tr><th>Kota</th><th>Region</th><th>Layanan</th><th>Min (kg)</th><th>Harga/kg (Rp)</th><th>ETA</th><th>Catatan</th></tr>
+      {tarif.map((r: any, i: number) => (
+        <tr data-row={i}>
+          <td><input type="text" data-f="c" value={esc(r.c)}></td>
+          <td><select data-f="r">
+            <option selected={r.r === 'Sulawesi'}>Sulawesi</option>
+            <option selected={r.r === 'Maluku'}>Maluku</option>
+            <option selected={r.r === 'Papua'}>Papua</option>
+          </select></td>
+          <td><select data-f="s">
+            <option selected={r.s === 'PELNI'}>PELNI</option>
+            <option selected={r.s === 'RORO'}>RORO</option>
+            <option selected={r.s === 'Reguler'}>Reguler</option>
+          </select></td>
+          <td><input type="number" data-f="min" value={esc(r.min)} min="0" step="1"></td>
+          <td><input type="number" data-f="price" value={esc(r.price)} min="0" step="1"></td>
+          <td><input type="text" data-f="eta" value={esc(r.eta)}></td>
+          <td><input type="text" data-f="note" value={esc(r.note)}></td>
+        </tr>
+      ))}
+    </table>
+    </div>
+    <button type="button" id="saveTarifBtn">Simpan Tarif</button>
+    <div class="status" id="status-tarif"></div>
+  </div>
+
+  <h2>Kontak</h2>
+  <div class="card">
+    <label>Call center</label>
+    <input type="text" id="kontak-call_center" value={esc(kontak.call_center)}>
+    <label>Call center (format internasional)</label>
+    <input type="text" id="kontak-call_center_intl" value={esc(kontak.call_center_intl)}>
+    <label>WhatsApp umum</label>
+    <input type="text" id="kontak-whatsapp_umum" value={esc(kontak.whatsapp_umum)}>
+    <label>WhatsApp umum (format internasional)</label>
+    <input type="text" id="kontak-whatsapp_umum_intl" value={esc(kontak.whatsapp_umum_intl)}>
+    <label>Email</label>
+    <input type="text" id="kontak-email" value={esc(kontak.email)}>
+    <label>Jam operasional</label>
+    <input type="text" id="kontak-jam" value={esc(kontak.jam)}>
+    <label>Alamat</label>
+    <textarea id="kontak-alamat">{esc(kontak.alamat)}</textarea>
+    <label>Catatan internal</label>
+    <textarea id="kontak-note">{esc(kontak.note)}</textarea>
+    <button type="button" id="saveKontakBtn">Simpan Kontak</button>
+    <div class="status" id="status-kontak"></div>
+    <h3>Marketing per wilayah (JSON)</h3>
+    <textarea id="kontak-marketing">{JSON.stringify(kontak.marketing, null, 2)}</textarea>
+    <button type="button" data-save-json data-table="kontak" data-key="marketing" data-el="kontak-marketing" data-status="status-kontak-marketing">Simpan marketing</button>
+    <div class="status" id="status-kontak-marketing"></div>
+    <h3>Marketing wilayah (JSON)</h3>
+    <textarea id="kontak-marketing_wilayah">{JSON.stringify(kontak.marketing_wilayah, null, 2)}</textarea>
+    <button type="button" data-save-json data-table="kontak" data-key="marketing_wilayah" data-el="kontak-marketing_wilayah" data-status="status-kontak-marketing_wilayah">Simpan marketing_wilayah</button>
+    <div class="status" id="status-kontak-marketing_wilayah"></div>
+  </div>
+
+  <h2>SEO</h2>
+  <div class="card">
+    <label>Kode verifikasi Google Search Console</label>
+    <input type="text" id="seo-gscVerification" value={esc(seo.gscVerification)}>
+    <label>ID Google Analytics 4 (mis. G-XXXXXXX, kosong = nonaktif)</label>
+    <input type="text" id="seo-ga4Id" value={esc(seo.ga4Id)}>
+    <button type="button" id="saveSeoIdsBtn">Simpan GSC + GA4</button>
+    <div class="status" id="status-seo-ids"></div>
+    <h3>SEO halaman Beranda</h3>
+    <label>Title</label>
+    <input type="text" id="seo-home-title" value={esc(seoHome.title)}>
+    <label>Description</label>
+    <textarea id="seo-home-description">{esc(seoHome.description)}</textarea>
+    <label>OG Title</label>
+    <input type="text" id="seo-home-ogTitle" value={esc(seoHome.ogTitle)}>
+    <label>OG Description</label>
+    <textarea id="seo-home-ogDescription">{esc(seoHome.ogDescription)}</textarea>
+    <label>OG Image</label>
+    <input type="text" id="seo-home-ogImage" value={esc(seoHome.ogImage)}>
+    <button type="button" id="saveSeoHomeBtn">Simpan SEO Beranda</button>
+    <div class="status" id="status-seo-home"></div>
+    <h3>SEO halaman Daftar Harga</h3>
+    <label>Title</label>
+    <input type="text" id="seo-harga-title" value={esc(seoHarga.title)}>
+    <label>Description</label>
+    <textarea id="seo-harga-description">{esc(seoHarga.description)}</textarea>
+    <label>OG Title</label>
+    <input type="text" id="seo-harga-ogTitle" value={esc(seoHarga.ogTitle)}>
+    <label>OG Description</label>
+    <textarea id="seo-harga-ogDescription">{esc(seoHarga.ogDescription)}</textarea>
+    <label>OG Image</label>
+    <input type="text" id="seo-harga-ogImage" value={esc(seoHarga.ogImage)}>
+    <button type="button" id="saveSeoHargaBtn">Simpan SEO Daftar Harga</button>
+    <div class="status" id="status-seo-harga"></div>
+  </div>
+  </>
+)}
+</div>
+<script>
+(function () {
+  function el(id) { return document.getElementById(id); }
+  function setStatus(id, msg, ok) {
+    var n = el(id);
+    if (!n) return;
+    n.textContent = msg;
+    n.className = 'status ' + (ok ? 'ok' : 'err');
+  }
+  async function postJSON(url, body) {
+    var r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify(body),
+    });
+    var j = null;
+    try { j = await r.json(); } catch (e) { /* ignore */ }
+    if (!r.ok) throw new Error((j && j.error) || ('HTTP ' + r.status));
+    return j;
+  }
+  async function saveKV(table, key, value, statusId) {
+    setStatus(statusId, 'Menyimpan...', true);
+    try {
+      await postJSON('/api/admin/save', { table: table, key: key, value: value });
+      setStatus(statusId, 'Tersimpan. Sudah tampil di situs.', true);
+    } catch (e) {
+      setStatus(statusId, 'Gagal: ' + e.message, false);
+    }
+  }
+  var loginBtn = el('loginBtn');
+  if (loginBtn) {
+    loginBtn.addEventListener('click', async function () {
+      setStatus('loginStatus', 'Memeriksa...', true);
+      try {
+        await postJSON('/api/admin/login', { password: el('pw').value });
+        location.reload();
+      } catch (e) {
+        setStatus('loginStatus', 'Gagal: ' + e.message, false);
+      }
+    });
+    el('pw').addEventListener('keydown', function (ev) {
+      if (ev.key === 'Enter') loginBtn.click();
+    });
+  }
+  var logoutBtn = el('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async function () {
+      try { await postJSON('/api/admin/logout', {}); } catch (e) { /* ignore */ }
+      location.reload();
+    });
+  }
+  document.querySelectorAll('[data-save-json]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var table = btn.getAttribute('data-table');
+      var key = btn.getAttribute('data-key');
+      var raw = el(btn.getAttribute('data-el')).value;
+      var statusId = btn.getAttribute('data-status');
+      var value;
+      try { value = JSON.parse(raw); }
+      catch (e) { setStatus(statusId, 'JSON tidak valid: ' + e.message, false); return; }
+      saveKV(table, key, value, statusId);
+    });
+  });
+  var saveHero = document.querySelector('[data-save-hero]');
+  if (saveHero) {
+    saveHero.addEventListener('click', function () {
+      var chips = el('hero-chips').value.split('\n').map(function (s) { return s.trim(); }).filter(Boolean);
+      saveKV('konten', 'hero', {
+        eyebrow: el('hero-eyebrow').value,
+        titleBefore: el('hero-titleBefore').value,
+        titleEm: el('hero-titleEm').value,
+        titleAfter: el('hero-titleAfter').value,
+        lead: el('hero-lead').value,
+        btnWa: el('hero-btnWa').value,
+        btnLayanan: el('hero-btnLayanan').value,
+        chips: chips,
+      }, 'status-hero');
+    });
+  }
+  var saveTarifBtn = el('saveTarifBtn');
+  if (saveTarifBtn) {
+    saveTarifBtn.addEventListener('click', async function () {
+      setStatus('status-tarif', 'Menyimpan...', true);
+      try {
+        var rows = [];
+        document.querySelectorAll('tr[data-row]').forEach(function (tr) {
+          var g = function (f) { var n = tr.querySelector('[data-f="' + f + '"]'); return n ? n.value : ''; };
+          rows.push({
+            c: g('c'),
+            r: g('r'),
+            s: g('s'),
+            min: parseInt(g('min'), 10),
+            price: parseInt(g('price'), 10),
+            eta: g('eta'),
+            note: g('note'),
+          });
+        });
+        var res = await postJSON('/api/admin/save', { table: 'tarif', rows: rows });
+        setStatus('status-tarif', 'Tersimpan: ' + res.rows + ' baris. Sudah tampil di situs.', true);
+      } catch (e) {
+        setStatus('status-tarif', 'Gagal: ' + e.message, false);
+      }
+    });
+  }
+  var saveKontakBtn = el('saveKontakBtn');
+  if (saveKontakBtn) {
+    saveKontakBtn.addEventListener('click', async function () {
+      var fields = ['call_center', 'call_center_intl', 'whatsapp_umum', 'whatsapp_umum_intl', 'email', 'jam', 'alamat', 'note'];
+      setStatus('status-kontak', 'Menyimpan...', true);
+      try {
+        for (var i = 0; i < fields.length; i++) {
+          await postJSON('/api/admin/save', { table: 'kontak', key: fields[i], value: el('kontak-' + fields[i]).value });
+        }
+        setStatus('status-kontak', 'Tersimpan. Sudah tampil di situs.', true);
+      } catch (e) {
+        setStatus('status-kontak', 'Gagal: ' + e.message, false);
+      }
+    });
+  }
+  var saveSeoIdsBtn = el('saveSeoIdsBtn');
+  if (saveSeoIdsBtn) {
+    saveSeoIdsBtn.addEventListener('click', async function () {
+      setStatus('status-seo-ids', 'Menyimpan...', true);
+      try {
+        await postJSON('/api/admin/save', { table: 'seo', key: 'gscVerification', value: el('seo-gscVerification').value });
+        await postJSON('/api/admin/save', { table: 'seo', key: 'ga4Id', value: el('seo-ga4Id').value });
+        setStatus('status-seo-ids', 'Tersimpan. Sudah tampil di situs.', true);
+      } catch (e) {
+        setStatus('status-seo-ids', 'Gagal: ' + e.message, false);
+      }
+    });
+  }
+  function saveSeoPage(page, statusId) {
+    setStatus(statusId, 'Menyimpan...', true);
+    saveKV('seo', page, {
+      title: el('seo-' + page + '-title').value,
+      description: el('seo-' + page + '-description').value,
+      ogTitle: el('seo-' + page + '-ogTitle').value,
+      ogDescription: el('seo-' + page + '-ogDescription').value,
+      ogImage: el('seo-' + page + '-ogImage').value,
+    }, statusId);
+  }
+  var saveSeoHomeBtn = el('saveSeoHomeBtn');
+  if (saveSeoHomeBtn) saveSeoHomeBtn.addEventListener('click', function () { saveSeoPage('home', 'status-seo-home'); });
+  var saveSeoHargaBtn = el('saveSeoHargaBtn');
+  if (saveSeoHargaBtn) saveSeoHargaBtn.addEventListener('click', function () { saveSeoPage('harga', 'status-seo-harga'); });
+})();
+</script>
+</body>
+</html>

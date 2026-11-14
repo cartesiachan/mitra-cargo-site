@@ -1,15 +1,16 @@
 ---
 import Base from '../layouts/Base.astro';
-import tarifData from '../data/tarif.json';
-import konten from '../data/konten.json';
-const rows = tarifData.rows;
+import { loadSiteData } from '../lib/db';
+const data = await loadSiteData();
+Astro.response.headers.set('X-Data-Source', data.source);
+const { konten, tarif: rows } = data;
 const regions = [...new Set(rows.map((r) => r.r))];
 const cityCount = new Set(rows.map((r) => r.c)).size;
 const regionNames = regions.length > 1 ? regions.slice(0, -1).join(', ') + ', dan ' + regions[regions.length - 1] : regions[0];
 const fmt = (n) => 'Rp' + n.toLocaleString('id-ID');
 const svcLabel = (s) => s === 'PELNI' ? 'Via Kapal PELNI' : s === 'RORO' ? 'Via Kapal RORO' : 'Reguler';
 ---
-<Base seoKey="harga">
+<Base seoKey="harga" data={data}>
 <main>
 <section class="tarif-table" id="tarif">
   <div class="wrap">
