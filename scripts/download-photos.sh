@@ -2,6 +2,8 @@
 # Download all 12 photos into public/images (photos are not stored in git).
 # Run from the repo root: bash scripts/download-photos.sh
 set -e
+# The images dir is NOT in git (no tracked files), so a fresh clone lacks it.
+mkdir -p "$(dirname "$0")/../public/images"
 cd "$(dirname "$0")/../public/images"
 curl -sSL --fail -o "collage-container.jpg" "https://www.mitraperkasacargo.com/wp-content/uploads/ekspedisi-jakarta-murah.jpg" && echo "collage-container.jpg $(stat -c%s "collage-container.jpg") bytes"
 curl -sSL --fail -o "collage-kalimantan.jpg" "https://www.mitraperkasacargo.com/wp-content/uploads/ekspedisi-jakarta-kalimantan.jpg" && echo "collage-kalimantan.jpg $(stat -c%s "collage-kalimantan.jpg") bytes"
