@@ -1,0 +1,10 @@
+name = "mitra-perkasa-cargo"
+compatibility_date = "2026-11-14"
+
+# D1 binding — remote database created 2026-11-14 (id aa54eb0e-0948-461c-9cbc-45f956926434,
+# region WNAM) after the token got D1 Read/Write scope. Local dev uses a local D1 and ignores
+# the remote id.
+[[d1_databases]]
+binding = "DB"
+database_name = "gagian-cargo-poc"
+database_id = "aa54eb0e-0948-461c-9cbc-45f956926434"

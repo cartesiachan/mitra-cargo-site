@@ -1,3 +1,9 @@
+---
+interface Props { brand: string; waUmum: string; marketing: Record<string, string>; }
+const { brand, waUmum, marketing } = Astro.props;
+const embedded = JSON.stringify({ brand, waUmum, marketing }).replace(/</g, '\\u003c');
+---
+<script type="application/json" id="cekongkir-data" set:html={embedded}></script>
 <div class="hero-tool" id="tarif" data-astro="island" data-astro-label="ISLAND · JS DI SINI">
       <span class="island-tag">ISLAND — interaktif</span>
       <div class="hero-tabs" role="tablist" aria-label="Alat pengiriman">
@@ -48,14 +54,23 @@
     </div>
 
 <script>
-import tarifData from '../data/tarif.json';
-import kontenData from '../data/konten.json';
-import kontakData from '../data/kontak.json';
-const TARIF = tarifData.rows;
-const BRAND = kontenData.brand;
-const WA_UMUM = kontakData.whatsapp_umum_intl;
-const MARKETING = {};
-kontakData.marketing_wilayah.forEach(function(m){ MARKETING[m.region] = m.nomor_intl; });
+// SSR PoC: tarif comes from the runtime /api/tarif endpoint (D1), not from
+// a JSON bundle. Brand / WA numbers come from the server render via the
+// embedded JSON blob above.
+const DATA = JSON.parse(document.getElementById('cekongkir-data').textContent);
+const BRAND = DATA.brand;
+const WA_UMUM = DATA.waUmum;
+const MARKETING = DATA.marketing;
+let TARIF = [];
+let tarifError = false;
+try {
+  const resp = await fetch('/api/tarif');
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  const json = await resp.json();
+  TARIF = json.rows || [];
+} catch (e) {
+  tarifError = true;
+}
 const REGIONS = [];
 TARIF.forEach(function(r){ if(REGIONS.indexOf(r.r) === -1) REGIONS.push(r.r); });
 const REGION_NAMES = REGIONS.length > 1 ? REGIONS.slice(0, -1).join(', ') + ', dan ' + REGIONS[REGIONS.length - 1] : REGIONS[0];
@@ -125,6 +140,11 @@ const REGION_NAMES = REGIONS.length > 1 ? REGIONS.slice(0, -1).join(', ') + ', d
   var cekResult = document.getElementById('cekResult');
   var weightInput = document.getElementById('heroWeight');
   function doCek(){
+    if (tarifError) {
+      cekResult.style.display = 'block';
+      cekResult.innerHTML = '<b>Tarif belum bisa dimuat.</b> Coba muat ulang halaman, atau tanya tarif langsung ke admin via WhatsApp.';
+      return;
+    }
     var q = norm(toInput.value);
     var city = cities.find(function(x){ return norm(x.c) === q; })
       || cities.find(function(x){ return norm(x.c).indexOf(q) === 0; })

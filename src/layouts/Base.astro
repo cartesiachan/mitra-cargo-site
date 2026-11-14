@@ -1,9 +1,8 @@
 ---
-import konten from '../data/konten.json';
-import kontak from '../data/kontak.json';
-import seo from '../data/seo.json';
-interface Props { seoKey: 'home' | 'harga'; }
-const { seoKey } = Astro.props;
+import type { SiteData } from '../lib/db';
+interface Props { seoKey: 'home' | 'harga'; data: SiteData; }
+const { seoKey, data } = Astro.props;
+const { konten, kontak, seo } = data;
 const page = seo[seoKey];
 const brand = konten.brand;
 const waUmum = `https://wa.me/${kontak.whatsapp_umum_intl}?text=${encodeURIComponent(`Halo ${brand}, ${konten.wa.penawaran}`)}`;
