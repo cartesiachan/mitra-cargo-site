@@ -3,9 +3,14 @@ import Base from '../layouts/Base.astro';
 import CekOngkir from '../components/CekOngkir.astro';
 import Icon from '../components/Icon.astro';
 import { loadSiteData } from '../lib/db';
+import { resolveTema, resolveOverlay, heroBackground, processBackground } from '../lib/tema';
 const data = await loadSiteData();
 Astro.response.headers.set('X-Data-Source', data.source);
 const { konten, kontak } = data;
+const temaIdx = resolveTema(konten.tema);
+const ovIdx = resolveOverlay(konten.heroOverlay);
+const heroBgIdx = heroBackground(temaIdx, ovIdx);
+const processBgIdx = processBackground(temaIdx);
 const brand = konten.brand;
 const waNum = (region: string) => kontak.marketing_wilayah.find((m) => m.region === region)?.nomor_intl ?? kontak.whatsapp_umum_intl;
 const waHero = `https://wa.me/${kontak.whatsapp_umum_intl}?text=${encodeURIComponent(`Halo ${brand}, ${konten.wa.penawaranHero}`)}`;
@@ -15,7 +20,7 @@ kontak.marketing_wilayah.forEach((m) => { marketing[m.region] = m.nomor_intl; })
 ---
 <Base seoKey="home" data={data}>
 <main id="beranda">
-<section class="hero" data-astro="static" data-astro-label="STATIC · 0 JS" style="padding-top:56px">
+<section class="hero" data-astro="static" data-astro-label="STATIC · 0 JS" style={`padding-top:56px;background-image:${heroBgIdx}`}>
   <div class="wrap hero-grid">
     <div>
       <p class="eyebrow">{konten.hero.eyebrow}</p>
@@ -135,7 +140,7 @@ kontak.marketing_wilayah.forEach((m) => { marketing[m.region] = m.nomor_intl; })
 </section>
 
 <!-- PROCESS -->
-<section class="process" data-astro="static" data-astro-label="STATIC · 0 JS">
+<section class="process" data-astro="static" data-astro-label="STATIC · 0 JS" style={`background-image:${processBgIdx}`}>
   <div class="wrap">
     <p class="eyebrow reveal">{konten.process.eyebrow}</p>
     <h2 class="reveal">{konten.process.title}</h2>

@@ -351,5 +351,19 @@
     "photoNote": "Foto di tiap kartu adalah foto stok Wikimedia Commons — slot ini yang diganti dengan foto asli perusahaan (pelabuhan, kapal, gudang, armada).",
     "sub": "Pengiriman kargo terpercaya via laut, darat, dan udara ke seluruh wilayah Indonesia dengan tarif murah, aman, dan profesional. Setiap rute punya marketing khusus — tombol di bawah mengarah ke nomor yang tepat.",
     "title": "Layanan logistik & ekspedisi spesialis"
+  },
+  "heroOverlay": {
+    "left": 0.82,
+    "right": 0.4
+  },
+  "tema": {
+    "brand": "#970A0A",
+    "aksen": "#FFCD06",
+    "navy": "#0f172a",
+    "hijau": "#16a34a"
+  },
+  "pengumuman": {
+    "aktif": false,
+    "teks": ""
   }
 }
