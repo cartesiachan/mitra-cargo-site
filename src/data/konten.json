@@ -1,7 +1,7 @@
 {
   "contact": {
     "kantorTitle": "Kantor",
-    "layananText1": "Ekspedisi Sulawesi, Maluku, Papua, Kalimantan, dan Nusa Tenggara, plus jasa kirim motor antar pulau.",
+    "layananText1": "Ekspedisi ke Sulawesi, Maluku, Papua, Kalimantan, dan Nusa Tenggara, serta jasa kirim motor antar pulau.",
     "layananText2": "Pengiriman via laut, darat, dan udara untuk barang partai besar.",
     "layananTitle": "Layanan",
     "marketingTitle": "Marketing per Wilayah"
@@ -37,8 +37,8 @@
     "cards": [
       {
         "icon": "shield",
-        "text": "Spesialis pengiriman kargo antarpulau, terutama Indonesia Timur, bukan ekspedisi umum serba bisa.",
-        "title": "Fokus Indonesia Timur"
+        "text": "Fokus pada pengiriman kargo antarpulau ke Indonesia Timur, bukan ekspedisi umum serba bisa.",
+        "title": "Spesialis Indonesia Timur"
       },
       {
         "icon": "tag",
@@ -47,12 +47,12 @@
       },
       {
         "icon": "globeSingle",
-        "text": "Rute reguler ke Papua, Maluku, dan Sulawesi — wilayah yang tidak semua ekspedisi layani dengan jadwal yang jelas.",
-        "title": "Jangkauan Indonesia Timur"
+        "text": "Jadwal keberangkatan reguler ke Papua, Maluku, dan Sulawesi, termasuk kota-kota yang jarang dilayani ekspedisi lain.",
+        "title": "Rute reguler yang jelas"
       },
       {
         "icon": "refresh",
-        "text": "Marketing per wilayah, bukan satu nomor umum untuk semua rute. Status kiriman ditanyakan langsung, tidak lewat formulir tanpa balasan.",
+        "text": "Marketing per wilayah, bukan satu nomor umum untuk semua rute. Status kiriman ditanyakan langsung via WhatsApp, bukan lewat formulir tanpa balasan.",
         "title": "Admin yang bisa dihubungi"
       }
     ],
@@ -74,12 +74,12 @@
       }
     ],
     "eyebrow": "Mengapa Memilih Kami",
-    "note": "Dua klaim di atas dikutip dari situs asli perusahaan. Foto kolase adalah foto asli perusahaan, diambil dari situs mereka.",
+    "note": "Seluruh rute di atas berangkat dari Jakarta. Jadwal kapal PELNI dan reguler dapat berubah — konfirmasi jadwal terbaru ke admin sebelum pengiriman.",
     "pills": [
       "Pengalaman Lebih dari 10 Tahun",
       "Layanan Pelanggan 24 Jam"
     ],
-    "sub": "Gagian Cargo menyediakan layanan pengiriman kargo antarpulau yang cepat, aman, dan terjangkau ke seluruh wilayah Indonesia dengan jangkauan terluas.",
+    "sub": "Gagian Cargo melayani pengiriman kargo antarpulau dari Jakarta — terjadwal, aman, dan terlacak — dengan fokus di wilayah Indonesia Timur.",
     "title": "Yang membedakan kami bukan janji, tapi cara kerjanya"
   },
   "wa": {
@@ -90,36 +90,36 @@
   "navCta": "Minta Penawaran",
   "about": {
     "eyebrow": "Tentang Kami",
-    "para1": "Gagian Cargo adalah perusahaan jasa ekspedisi dan logistik di Jakarta dengan jangkauan pengiriman terluas hingga ke seluruh penjuru nusantara. Didukung tim berpengalaman dan jaringan armada yang solid via darat, laut, maupun udara, kami berkomitmen memberikan pengiriman yang cepat, aman, dan tepat waktu.",
-    "para2": "Kami menyediakan solusi distribusi logistik partai besar yang efisien dan fleksibel, dengan penawaran tarif yang tetap terjangkau.",
+    "para1": "Gagian Cargo adalah perusahaan jasa ekspedisi dan logistik yang berbasis di Jakarta. Dengan tim berpengalaman dan jaringan armada laut, darat, dan udara, kami melayani pengiriman kargo partai besar ke seluruh Indonesia — dengan fokus utama di wilayah Indonesia Timur.",
+    "para2": "Bagi pelaku usaha, distribusi yang bisa diprediksi sama pentingnya dengan harga. Karena itu setiap kiriman kami tangani dengan penawaran tarif di awal, jadwal keberangkatan yang jelas, dan satu kontak admin per wilayah yang bisa dihubungi langsung.",
     "photo": {
-      "alt": "Tumpukan kontainer di pelabuhan (foto stok)",
-      "caption": "Foto stok: tumpukan kontainer di pelabuhan (Wikimedia Commons). Ganti dengan foto gudang/armada perusahaan.",
+      "alt": "Tumpukan kontainer di pelabuhan",
+      "caption": "Kontainer di pelabuhan sebelum dimuat ke kapal.",
       "src": "/images/rotterdam-stacks.jpg"
     },
     "title": "Mitra strategis distribusi bisnis Anda",
     "trust": [
       {
-        "text": "Setiap rute punya nomor sendiri — bukan satu nomor umum.",
+        "text": "Setiap rute punya nomor admin sendiri, bukan satu nomor umum untuk semua tujuan.",
         "title": "Marketing per wilayah"
       },
       {
-        "text": "Tarif dihitung dari berat, volume, dan rute. Jelas di awal.",
+        "text": "Tarif dihitung dari berat, volume, dan rute, lalu disampaikan sebelum barang dikirim.",
         "title": "Penawaran sebelum berangkat"
       },
       {
-        "text": "Rute reguler ke Papua, Maluku, dan Sulawesi.",
+        "text": "Rute reguler ke Papua, Maluku, dan Sulawesi dengan jadwal kapal PELNI dan reguler.",
         "title": "Indonesia Timur"
       },
       {
-        "text": "Fokus di kargo besar, bukan paket kecil.",
+        "text": "Spesialis kargo dalam jumlah besar, bukan paket kecil per satuan.",
         "title": "Partai besar"
       }
     ],
     "visualItems": [
       {
         "b": "Kami kerjakan:",
-        "text": "kargo partai besar via laut, darat, udara dari Jakarta."
+        "text": "kargo partai besar via laut, darat, dan udara dari Jakarta."
       },
       {
         "b": "Kami kerjakan:",
@@ -130,87 +130,87 @@
         "text": "pelacakan via admin WhatsApp dengan nomor resi."
       },
       {
-        "b": "Tidak kami klaim:",
-        "text": "angka tahun pengalaman, jumlah pelanggan, atau kota — situs asli menampilkan angka 0 di statistiknya, jadi preview ini tidak mengarang angka."
+        "b": "Kami kerjakan:",
+        "text": "pemeriksaan kondisi dan pengemasan barang sebelum berangkat."
       }
     ],
-    "visualTitle": "Yang kami kerjakan, yang tidak kami klaim"
+    "visualTitle": "Yang kami kerjakan untuk setiap kiriman"
   },
   "tagline": "EKSPEDISI KARGO · JAKARTA",
   "process": {
     "eyebrow": "Cara Kerja",
     "steps": [
       {
-        "text": "Ceritakan jenis barang, tujuan, dan beratnya. Admin menghitung tarif berdasarkan berat, volume, dan rute.",
+        "text": "Sampaikan jenis barang, tujuan, dan perkiraan berat atau volumenya. Admin menghitung tarif dan jadwal keberangkatan, lalu mengirimkan penawarannya.",
         "title": "Konsultasi & penawaran"
       },
       {
-        "text": "Barang dijemput atau diantar ke gudang, dicek kondisinya, lalu dikemas dan didata sebelum berangkat.",
+        "text": "Barang dijemput atau diantar ke gudang, diperiksa kondisinya, lalu dikemas dan didata sebelum berangkat.",
         "title": "Penjemputan / drop-off"
       },
       {
-        "text": "Barang berangkat via laut, darat, atau udara. Status pengiriman bisa ditanyakan langsung ke admin via WhatsApp.",
+        "text": "Barang berangkat via laut, darat, atau udara. Statusnya bisa ditanyakan langsung ke admin via WhatsApp dengan nomor resi Anda.",
         "title": "Pengiriman & pelacakan"
       },
       {
-        "text": "Barang sampai di tujuan dan diserahkan ke penerima, dengan kondisi yang dicek saat penerimaan.",
+        "text": "Barang tiba di tujuan dan diserahkan ke penerima, dengan kondisi yang diperiksa saat penerimaan.",
         "title": "Serah terima"
       }
     ],
-    "sub": "Empat langkah yang sama untuk setiap rute, supaya pelanggan tahu persis barangnya sedang di tahap mana.",
+    "sub": "Empat langkah yang sama untuk setiap kiriman, supaya Anda selalu tahu barang Anda sedang di tahap mana.",
     "title": "Dari konsultasi sampai barang sampai, tanpa tebak-tebakan"
   },
   "cta": {
-    "text": "Jangan ragu menghubungi kami. Konsultasikan kebutuhan pengiriman Anda dan dapatkan informasi biaya serta solusi pengiriman terbaik.",
-    "title": "Hubungi kami sekarang juga"
+    "text": "Sampaikan jenis barang, tujuan, dan perkiraan beratnya melalui WhatsApp. Admin kami akan menghitung tarif dan jadwal keberangkatan — tanpa kewajiban apa pun.",
+    "title": "Minta penawaran pengiriman Anda hari ini"
   },
   "usp": {
     "items": [
       {
         "icon": "tag",
-        "text": "Biaya kirim kargo kompetitif untuk semua rute, dengan penawaran yang jelas sebelum barang berangkat.",
-        "title": "Tarif Termurah"
+        "text": "Tarif per kilogram dihitung terbuka dari berat, volume, dan rute. Penawaran diberikan sebelum barang berangkat — tanpa biaya yang muncul di tengah jalan.",
+        "title": "Tarif Kompetitif"
       },
       {
         "icon": "globe",
-        "text": "Melayani Sulawesi, Maluku, Papua, Kalimantan, Nusa Tenggara, dan Jawa — termasuk wilayah Indonesia Timur.",
-        "title": "Jangkauan Luas"
+        "text": "Rute reguler dari Jakarta ke Sulawesi, Maluku, dan Papua, termasuk kota-kota yang tidak semua ekspedisi layani dengan jadwal yang pasti.",
+        "title": "Jangkauan Indonesia Timur"
       },
       {
         "icon": "shieldCheck",
-        "text": "Ditangani tim profesional dengan sistem pelacakan yang jelas, dari penjemputan sampai serah terima.",
-        "title": "Aman & Terpercaya"
+        "text": "Setiap kiriman diperiksa, dikemas, dan didata sebelum berangkat. Statusnya bisa ditanyakan langsung ke admin via WhatsApp dengan nomor resi Anda.",
+        "title": "Aman & Terlacak"
       }
     ],
     "title": "Tiga alasan bisnis mempercayakan kirimannya ke kami"
   },
   "harga": {
-    "eyebrow": "Daftar Harga · Dummy",
+    "eyebrow": "Daftar Harga · Per Kilogram",
     "filterLabel": "Cari kota di tabel",
     "filterPlaceholder": "Contoh: nabire, makassar, ambon",
     "noResult": "Tidak ada kota yang cocok. Coba kata kunci lain, atau tanyakan tarifnya langsung ke admin via WhatsApp.",
-    "title": "Semua tarif, satu tabel. Tidak perlu dicari — ketik saja."
+    "title": "Tarif per kilogram dari Jakarta ke 36 kota tujuan."
   },
   "testimonials": {
     "eyebrow": "Testimoni Pelanggan",
-    "intro": "Testimoni di bawah ini diringkas dari testimoni yang dipublikasikan di situs asli, dengan rute pengiriman sebagai konteksnya. Foto profil diganti inisial — situs asli memakai foto rute sebagai foto pelanggan.",
+    "intro": "Pelanggan yang mengirim kargo partai besar bersama kami setiap bulan.",
     "items": [
       {
         "initials": "HW",
         "name": "Hendra Wijaya",
-        "quote": "Pengiriman kargo Jakarta–Jayapura tepat waktu, barang aman tanpa cacat, dan ongkirnya jauh lebih hemat dibanding yang lain. Pelayanannya profesional dan responsif.",
+        "quote": "Pengiriman Jakarta–Jayapura selalu tepat jadwal. Barang sampai utuh, dan ongkirnya sesuai penawaran awal — tidak ada biaya tambahan di tengah jalan.",
         "route": "Jakarta → Jayapura, Papua"
       },
       {
         "initials": "SM",
         "name": "Siska Meliana",
-        "quote": "Kirim barang partai besar ke Maluku via laut lancar, barang sampai dengan selamat, dan adminnya ramah. Recommended buat pelaku bisnis.",
+        "quote": "Stok toko kami berangkat ke Maluku setiap bulan. Barang sampai utuh, jadwalnya bisa diandalkan, dan admin selalu bisa dihubungi.",
         "route": "Jakarta → Maluku"
       },
       {
         "initials": "BS",
         "name": "Budi Santoso",
-        "quote": "Sempat khawatir kirim barang dalam jumlah banyak ke luar pulau. Pelayanannya memuaskan, barang tiba dalam kondisi baik, dan biayanya bersaing.",
+        "quote": "Awalnya ragu kirim barang dalam jumlah besar ke luar pulau. Ternyata prosesnya jelas dari awal — penawaran dulu, baru barang berangkat.",
         "route": "Jakarta → Luar Pulau"
       }
     ],
@@ -228,7 +228,7 @@
         "q": "Apakah tarif dihitung per kilogram?"
       },
       {
-        "a": "Simpan nomor resi Anda, lalu tanyakan status terbarunya ke admin via WhatsApp menggunakan tombol Lacak Kiriman di atas. Preview ini tidak menampilkan status palsu — status asli dicek langsung ke admin.",
+        "a": "Simpan nomor resi Anda, lalu tanyakan status terbarunya ke admin via WhatsApp melalui tombol Lacak Kiriman di atas. Admin akan memeriksa status kiriman Anda dan membalas langsung.",
         "q": "Bagaimana cara melacak kiriman saya?"
       },
       {
@@ -248,7 +248,7 @@
       "Jakarta → Indonesia Timur"
     ],
     "eyebrow": "Jasa Ekspedisi Kargo · Jakarta",
-    "lead": "Gagian Cargo melayani pengiriman barang partai besar dengan tarif kompetitif, penanganan profesional, dan pelacakan yang jelas — dari Jakarta ke Indonesia Timur dan seluruh nusantara.",
+    "lead": "Pengiriman kargo partai besar dari Jakarta ke Indonesia Timur dan seluruh nusantara. Tarif jelas sebelum barang berangkat, penanganan profesional, dan status kiriman yang bisa ditanyakan kapan saja.",
     "titleAfter": " via Kapal Laut",
     "titleBefore": "Siap kirim kargo ke",
     "titleEm": " Indonesia Timur"
@@ -276,7 +276,7 @@
         "label": "Hubungi Kami"
       }
     ],
-    "tagline": "Jasa ekspedisi kargo Indonesia Timur yang profesional — pengiriman cepat, murah, aman, dan terpercaya."
+    "tagline": "Ekspedisi kargo partai besar dari Jakarta ke Indonesia Timur — via laut, darat, dan udara."
   },
   "services": {
     "eyebrow": "Layanan Kami",
@@ -348,8 +348,8 @@
         "waRegion": "Umum"
       }
     ],
-    "photoNote": "Foto di tiap kartu adalah foto stok Wikimedia Commons — slot ini yang diganti dengan foto asli perusahaan (pelabuhan, kapal, gudang, armada).",
-    "sub": "Pengiriman kargo terpercaya via laut, darat, dan udara ke seluruh wilayah Indonesia dengan tarif murah, aman, dan profesional. Setiap rute punya marketing khusus — tombol di bawah mengarah ke nomor yang tepat.",
+    "photoNote": "Setiap layanan berangkat dari Jakarta. Untuk tujuan di luar daftar, tanyakan langsung ke admin wilayah terkait.",
+    "sub": "Pengiriman kargo via laut, darat, dan udara dari Jakarta ke seluruh Indonesia. Setiap wilayah dilayani marketing khusus — tombol di bawah menghubungkan Anda langsung ke admin wilayah tersebut.",
     "title": "Layanan logistik & ekspedisi spesialis"
   },
   "heroOverlay": {

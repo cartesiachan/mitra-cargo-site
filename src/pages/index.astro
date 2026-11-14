@@ -55,21 +55,12 @@ kontak.marketing_wilayah.forEach((m) => { marketing[m.region] = m.nomor_intl; })
         <circle class="port" cx="362.4" cy="209.3" r="5"/>
         <text x="362.4" y="225.3" fill="#cbd5e1" font-size="12" text-anchor="middle">Kupang</text>
       </svg>
-      <figcaption>Peta Indonesia — garis bergerak = rute aktif. Data peta: indonesia-geojson (GitHub). Dibuat dengan SVG + CSS — tanpa JavaScript, tanpa foto.</figcaption>
+      <figcaption>Rute pengiriman aktif dari Jakarta ke Makassar, Ambon, Jayapura, Banjarmasin, dan Kupang.</figcaption>
     </figure>
   </div>
 
       <CekOngkir brand={brand} waUmum={kontak.whatsapp_umum_intl} marketing={marketing} />
 </section>
-<!-- ASTRO STRIP -->
-<div class="astro-strip" data-astro="static" data-astro-label="STATIC · 0 JS">
-  <div class="wrap">
-    <span><b>Kenapa halaman ini cepat:</b> <span>90% halaman ini statis — 0 KB JavaScript. Hanya 1 pulau interaktif yang memuat JS: widget Cek Ongkir di hero.</span></span>
-    <span class="pill">Astro · 0 JS default</span>
-    <span class="pill">1 island: Cek Ongkir</span>
-  </div>
-</div>
-
 <!-- TOOLS -->
 
 

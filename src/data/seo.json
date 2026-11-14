@@ -1,1 +1,18 @@
-{"ga4Id":"","gscVerification":"","harga":{"description":"Daftar harga ekspedisi kargo Jakarta ke Sulawesi, Maluku, dan Papua: tarif per kg via Kapal PELNI/RORO dan Reguler, lengkap dengan estimasi waktu.","ogDescription":"Tarif per kg via Kapal PELNI/RORO dan Reguler ke 36 kota di Sulawesi, Maluku, dan Papua.","ogImage":"","ogTitle":"Daftar Harga — Gagian Cargo","title":"Daftar Harga — Gagian Cargo"},"home":{"description":"Preview remake Gagian Cargo dengan Astro: jasa ekspedisi pengiriman barang partai besar via laut, darat, dan udara ke Sulawesi, Maluku, Papua, Kalimantan, dan Nusa Tenggara.","ogDescription":"Kirim kargo partai besar ke seluruh Indonesia — laut, darat, dan udara. Tarif kompetitif, penanganan profesional, pelacakan jelas.","ogImage":"/images/hero-koper.jpg","ogTitle":"Gagian Cargo — Jasa Ekspedisi Kargo ke Seluruh Indonesia","title":"Gagian Cargo — Preview Astro | Jasa Ekspedisi Kargo ke Seluruh Indonesia"}}
+{
+  "ga4Id": "",
+  "gscVerification": "",
+  "harga": {
+    "description": "Daftar harga ekspedisi kargo Jakarta ke Sulawesi, Maluku, dan Papua: tarif per kg via Kapal PELNI/RORO dan Reguler, lengkap dengan estimasi waktu.",
+    "ogDescription": "Tarif per kg via Kapal PELNI/RORO dan Reguler ke 36 kota di Sulawesi, Maluku, dan Papua.",
+    "ogImage": "",
+    "ogTitle": "Daftar Harga — Gagian Cargo",
+    "title": "Daftar Harga — Gagian Cargo"
+  },
+  "home": {
+    "description": "Gagian Cargo — jasa ekspedisi pengiriman barang partai besar via laut, darat, dan udara dari Jakarta ke Sulawesi, Maluku, Papua, Kalimantan, dan Nusa Tenggara.",
+    "ogDescription": "Kirim kargo partai besar ke seluruh Indonesia — laut, darat, dan udara. Tarif kompetitif, penanganan profesional, pelacakan jelas.",
+    "ogImage": "/images/hero-koper.jpg",
+    "ogTitle": "Gagian Cargo — Jasa Ekspedisi Kargo ke Seluruh Indonesia",
+    "title": "Gagian Cargo | Jasa Ekspedisi Kargo ke Indonesia Timur"
+  }
+}
